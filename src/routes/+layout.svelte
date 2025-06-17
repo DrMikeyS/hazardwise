@@ -89,6 +89,14 @@
         </li>
         <li class="nav-item">
           <a
+            class="nav-link { $page.url.pathname === `${base}/workspace/compliance` ? 'active' : '' }"
+            href="{base}/workspace/compliance"
+          >
+            🛡️ <span class="label ms-2">Compliance</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
             class="nav-link { $page.url.pathname === `${base}/workspace/export` ? 'active' : '' }"
             href="{base}/workspace/export"
           >
