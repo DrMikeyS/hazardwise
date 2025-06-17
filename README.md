@@ -12,6 +12,12 @@
 
 [Live Demo](https://drmikeys.github.io/hazardwise)
 
+A ready-to-use template DCB0160 hazard log for a generic AI-scribe tool is included in the repo.  
+You can download it and import directly into the app:
+
+[Download the Generic AI Scribe Tool hazard log](test_data/Generic AI Scribe Tool-hazardwise-data.json)
+
+
 ## Getting Started
 
 ### Prerequisites
