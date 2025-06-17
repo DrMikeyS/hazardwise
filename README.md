@@ -15,7 +15,7 @@
 A ready-to-use template DCB0160 hazard log for a generic AI-scribe tool is included in the repo.  
 You can download it and import directly into the app:
 
-[Download the Generic AI Scribe Tool hazard log](test_data/Generic AI Scribe Tool-hazardwise-data.json)
+[Download the Generic AI Scribe Tool hazard log](https://raw.githubusercontent.com/DrMikeyS/hazardwise/refs/heads/main/test_data/Generic%20AI%20Scribe%20Tool-hazardwise-data.json)
 
 
 ## Getting Started
