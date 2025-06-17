@@ -1,0 +1,321 @@
+{
+  "project": {
+    "title": "Generic AI Scribe Tool",
+    "description": "",
+    "safetyOfficer": "",
+    "hazards": [
+      {
+        "id": "1",
+        "description": "AI Scribe incorrectly summarises consultation",
+        "causeIds": [
+          "C01",
+          "C02",
+          "C03",
+          "C04",
+          "C05",
+          "C06",
+          "C07",
+          "C08",
+          "C09"
+        ],
+        "mitigationIds": [],
+        "impactIds": [],
+        "hazardImpacts": [
+          {
+            "impactID": "I01",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I02",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I03",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I04",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I05",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I06",
+            "likelihood": "Possible"
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "description": "Data entered into the incorrect patient record",
+        "causeIds": [
+          "C10",
+          "C11"
+        ],
+        "mitigationIds": [],
+        "impactIds": [],
+        "hazardImpacts": [
+          {
+            "impactID": "I01",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I02",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I03",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I04",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I05",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I06",
+            "likelihood": "Unlikely"
+          },
+          {
+            "impactID": "I07",
+            "likelihood": "Possible"
+          },
+          {
+            "impactID": "I08",
+            "likelihood": "Possible"
+          }
+        ]
+      },
+      {
+        "id": "3",
+        "description": "Failure to gain informed consent for consultation recording",
+        "causeIds": [
+          "C12",
+          "C13"
+        ],
+        "mitigationIds": [],
+        "impactIds": [],
+        "hazardImpacts": [
+          {
+            "impactID": "I08",
+            "likelihood": "Possible"
+          },
+          {
+            "impactID": "I07",
+            "likelihood": "Rare"
+          }
+        ]
+      },
+      {
+        "id": "4",
+        "description": "Software used beyond the intended function (i.e. scribing consultations)",
+        "causeIds": [
+          "C14"
+        ],
+        "mitigationIds": [],
+        "impactIds": [],
+        "hazardImpacts": [
+          {
+            "impactID": "I06",
+            "likelihood": "Rare"
+          },
+          {
+            "impactID": "I08",
+            "likelihood": "Rare"
+          },
+          {
+            "impactID": "I01",
+            "likelihood": "Rare"
+          }
+        ]
+      }
+    ]
+  },
+  "causes": [
+    {
+      "id": "C01",
+      "description": "Speech-to-text model misinterprets speech or medical terminology.",
+      "mitigationIds": []
+    },
+    {
+      "id": "C02",
+      "description": "Large Language Model misinterprets context or intent.",
+      "mitigationIds": [
+        "M01"
+      ]
+    },
+    {
+      "id": "C03",
+      "description": "Inadequate speech captured due to mic problems, power failure, software bugs or noisy environment.",
+      "mitigationIds": [
+        "M02"
+      ]
+    },
+    {
+      "id": "C04",
+      "description": "Clinicians not reviewing information before entering into EHR/Being too complacent if a software change happens and error types change",
+      "mitigationIds": [
+        "M03"
+      ]
+    },
+    {
+      "id": "C05",
+      "description": "Speech to text model struggles with strong accent or mumbling",
+      "mitigationIds": [
+        "M04"
+      ]
+    },
+    {
+      "id": "C06",
+      "description": "Comments not attributed to correct speaker",
+      "mitigationIds": []
+    },
+    {
+      "id": "C07",
+      "description": "Large Language Model hallucinates clinical information",
+      "mitigationIds": [
+        "M05"
+      ]
+    },
+    {
+      "id": "C08",
+      "description": "Using the model for historical consultations may prevent users from reliably recalling details, increasing the risk of errors in the model's output.",
+      "mitigationIds": [
+        "M06"
+      ]
+    },
+    {
+      "id": "C09",
+      "description": "Copy-pasting large sections of a patient's past medical history or clinic letters into a model may result in unverified and incorrect information being included in the output, as users might not recall all the details and may fail to adequately verify the accuracy of the transfer.",
+      "mitigationIds": [
+        "M07"
+      ]
+    },
+    {
+      "id": "C10",
+      "description": "User errors in data handling",
+      "mitigationIds": [
+        "M08"
+      ]
+    },
+    {
+      "id": "C11",
+      "description": "Software failure in integration system",
+      "mitigationIds": []
+    },
+    {
+      "id": "C12",
+      "description": "Lack of awareness of the need to consent & provision of information resources",
+      "mitigationIds": [
+        "M09"
+      ]
+    },
+    {
+      "id": "C13",
+      "description": "Time constraint or forgetting to consent",
+      "mitigationIds": [
+        "M10"
+      ]
+    },
+    {
+      "id": "C14",
+      "description": "User adds custom prompts that directly or indirectly lead the software to make medical reccomendations or other forms of inference. ",
+      "mitigationIds": [
+        "M11"
+      ]
+    }
+  ],
+  "mitigations": [
+    {
+      "id": "M01",
+      "description": "Reinforce good communication practice of summarising reguarly what the patient has said, observations and decisions for clarity (both for patient and model)"
+    },
+    {
+      "id": "M02",
+      "description": "Appropraite microphones to be used. Clinical rooms are suitably soundproofed. Advising users about the impact of background noise."
+    },
+    {
+      "id": "M03",
+      "description": "All users are trained to review closely every output before adding to medical record. Users must be informed they hold ultimate medicolegal responsibility for the entry into the medical record."
+    },
+    {
+      "id": "M04",
+      "description": "All users are made aware of this risk and aim to speak clearly and if not, be aware outputs may suffer."
+    },
+    {
+      "id": "M05",
+      "description": "All users are made aware of this risk and to be vigilant. All users are trained to review closely every output before adding to medical record."
+    },
+    {
+      "id": "M06",
+      "description": "Advise users to check the clinical note immediately after each consultation to quickly verify accuracy. Referral letters can be generated and reviewed at the end of the session, using the verified clinical note for reference, maintaining consistency with current dictation practices. Additionally, ensure system settings are configured to automatically delete all transcripts after 1 day to remove the temptation to work on historical inputs and to reduce data protection risks."
+    },
+    {
+      "id": "M07",
+      "description": "Limit the use of free text input to relevant, concise details that can be manually verified, and provide clear guidelines for users to review and verify all input data thoroughly before submission to the model."
+    },
+    {
+      "id": "M08",
+      "description": "All users are made aware of the risk of failing to transfer data correctly and to be vigilant."
+    },
+    {
+      "id": "M09",
+      "description": "Ensure posters and website information present. Consider adding to appointment reminders."
+    },
+    {
+      "id": "M10",
+      "description": "All users to be trained in neccessity to consent every time."
+    },
+    {
+      "id": "M11",
+      "description": "Any user who is adding custom prompts to be trained in how to ensure they outputs are within the scope of product purpose and non-medical device status."
+    }
+  ],
+  "impacts": [
+    {
+      "id": "I01",
+      "description": "Incorrect treatment or intervention given or performed",
+      "severity": "Major"
+    },
+    {
+      "id": "I02",
+      "description": "Delayed or missed treatment or intervention",
+      "severity": "Major"
+    },
+    {
+      "id": "I03",
+      "description": "Inappropriate continuation or cessation of treatment",
+      "severity": "Major"
+    },
+    {
+      "id": "I04",
+      "description": "Unnecessary or harmful diagnostic investigations and interventions",
+      "severity": "Major"
+    },
+    {
+      "id": "I05",
+      "description": "Patient monitoring and management escalation/de-escalation failure",
+      "severity": "Considerable"
+    },
+    {
+      "id": "I06",
+      "description": "Patient mismanagement and discrimination",
+      "severity": "Considerable"
+    },
+    {
+      "id": "I07",
+      "description": "Fine from ICO for data breach",
+      "severity": "Significant"
+    },
+    {
+      "id": "I08",
+      "description": "Loss of patient trust",
+      "severity": "Considerable"
+    }
+  ]
+}

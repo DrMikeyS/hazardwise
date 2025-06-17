@@ -76,9 +76,9 @@ const severityOptions = [
 const levels = {
   'Catastrophic': 5,
   'Major': 4,
-  'Moderate': 3,
-  'Minor': 2,
-  'Negligible': 1,
+  'Considerable': 3,
+  'Significant': 2,
+  'Minor': 1,
   'Almost Certain': 5,
   'Likely': 4,
   'Possible': 3,
@@ -94,6 +94,9 @@ $: rawScore = (levels[severity] || 0) * (levels[likelihood] || 0);
 $: riskResult = (levels[severity] && levels[likelihood])
   ? DCBRisk.assess(levels[likelihood], levels[severity])
   : null;
+
+// Live Debug output
+$: console.log('Levels', severity, likelihood, levels);  
 $: console.log('Risk assessment:', riskResult, rawScore);
 
   onMount(() => {
