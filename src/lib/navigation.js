@@ -1,7 +1,11 @@
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
+import { clearLocalStorage,clearCookies } from './utils/storeManagement';
+
 export function startNewProject() {
   console.log('Starting new project');
+  clearLocalStorage();
+  clearCookies();
   goto(base+'/new');
 }
 

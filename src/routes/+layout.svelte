@@ -4,9 +4,18 @@
   import '../app.css';
   import { page } from '$app/stores';
   import { base } from '$app/paths';
+  import { startNewProject } from '$lib/navigation.js';
   let collapsed = false;
   function toggleSidebar() {
     collapsed = !collapsed;
+  }
+
+  function handleStartNewProject() {
+    if (confirm('Really start new project? This will clear current data.')) {
+      startNewProject();
+    } else {
+      // abort
+    }    
   }
 
   // only show sidebar when path starts with /workspace
@@ -86,6 +95,15 @@
             📤 <span class="label ms-2">Export Tools</span>
           </a>
         </li>
+      <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link btn btn-link text-start w-100"
+        on:click={handleStartNewProject}
+      >
+        ✨ <span class="label ms-2">Start New Project</span>
+      </button>
+    </li>
       </ul>
     </div>
   {/if}

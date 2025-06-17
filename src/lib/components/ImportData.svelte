@@ -5,31 +5,8 @@
   import { impacts }     from '$lib/stores/impacts.js';
 import { goto } from '$app/navigation';
 import { base } from '$app/paths';
-  /**
-   * Remove all cookies by expiring them.
-   */
-  function clearCookies() {
-    document.cookie.split(';').forEach(cookie => {
-      const name = cookie.split('=')[0].trim();
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-    });
-  }
+import { clearCookies,clearLocalStorage } from '$lib/utils/storeManagement';
 
-  /**
-   * Purge any persisted data (cookies, web storage) and reset stores.
-   */
-  function purgeAllData() {
-    // Clear cookies
-    clearCookies();
-    // Clear local and session storage
-    localStorage.clear();
-    sessionStorage.clear();
-    // Reset stores to empty/default values
-    project.set({ title: '', description: '', safetyOfficer: '', hazards: [] });
-    causes.set([]);
-    mitigations.set([]);
-    impacts.set([]);
-  }
 
   /**
    * Read a JSON file and restore all four stores, after purging existing data.
@@ -40,7 +17,10 @@ import { base } from '$app/paths';
     const file = input.files[0];
 
     // Purge any existing cookies, storage, and store data
-    purgeAllData();
+    // Clear cookies
+    clearCookies();
+    // Clear local and session storage
+    clearLocalStorage();
 
     const reader = new FileReader();
 
