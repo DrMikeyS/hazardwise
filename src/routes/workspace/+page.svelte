@@ -83,7 +83,7 @@
               <button
                 type="button"
                 class="btn btn-sm btn-outline-secondary"
-                on:click={() => goto(`/workspace/hazard?id=${h.id}`)}
+                on:click={() => goto(base+`/workspace/hazard?id=${h.id}`)}
               >
                 Edit
               </button>
