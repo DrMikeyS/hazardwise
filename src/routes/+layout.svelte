@@ -69,34 +69,54 @@
       <div class="logo-text fs-4 fw-bold label">HazardWise</div>
     </div>
 
-    <ul class="nav nav-pills flex-column mt-3">
-      <li class="nav-item">
-        <a
-          class="nav-link {($page.url.pathname === base+'/workspace') ? 'active' : ''}"
-          href="{base}/workspace"
-        >
-          🏠 <span class="label ms-2">Hazards</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link {($page.url.pathname === base+'/about') ? 'active' : ''}"
-          href="{base}/about"
-        >
-          ℹ️ <span class="label ms-2">About</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link {($page.url.pathname === base+'/workspace/mitigations') ? 'active' : ''}"
-          href="{base}/workspace/mitigations"
-        >
-          ℹ️ <span class="label ms-2">Mitigations</span>
-        </a>
-      </li>
-    </ul>
-  </div>
+<ul class="nav nav-pills flex-column mt-3">
+  <li class="nav-item">
+    <a
+      class="nav-link { $page.url.pathname === `${base}/workspace` ? 'active' : '' }"
+      href="{base}/workspace"
+    >
+      ⚠️  <span class="label ms-2">Hazards</span>
+    </a>
+  </li>
 
+  <li class="nav-item">
+    <a
+      class="nav-link { $page.url.pathname === `${base}/workspace/mitigations` ? 'active' : '' }"
+      href="{base}/workspace/mitigations"
+    >
+      ⚙️ <span class="label ms-2">Manage Mitigations</span>
+    </a>
+  </li>
+
+  
+
+  <li class="nav-item">
+    <a
+      class="nav-link { $page.url.pathname === `${base}/workspace/impacts` ? 'active' : '' }"
+      href="{base}/workspace/impacts"
+    >
+      ⚡️ <span class="label ms-2">Manage Impacts</span>
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a
+      class="nav-link { $page.url.pathname === `${base}/workspace/project` ? 'active' : '' }"
+      href="{base}/workspace/project"
+    >
+      📊 <span class="label ms-2">Project Details</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a
+      class="nav-link { $page.url.pathname === `${base}/workspace/export` ? 'active' : '' }"
+      href="{base}/workspace/export"
+    >
+      📤 <span class="label ms-2">Export Tools</span>
+    </a>
+  </li>
+</ul>
+</div>
   <!-- Main content -->
   <main class="py-4 px-3 flex-grow-1 {collapsed ? 'main-collapsed' : 'main-expanded'}">
     <slot />
