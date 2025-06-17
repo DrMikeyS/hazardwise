@@ -1,7 +1,8 @@
 import { goto } from '$app/navigation';
-
+import { base } from '$app/paths';
 export function startNewProject() {
-  goto('/new');
+  console.log('Starting new project');
+  goto(base+'/new');
 }
 
 export function uploadProject() {

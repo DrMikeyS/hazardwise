@@ -3,7 +3,7 @@
   import 'bootstrap/dist/css/bootstrap.min.css';
   import '../app.css';
   import { page } from '$app/stores';
-
+  import { base } from '$app/paths';
   let collapsed = false;
   function toggleSidebar() {
     collapsed = !collapsed;
@@ -65,7 +65,7 @@
   <!-- Sidebar -->
   <div class="bg-light sidebar border-end vh-100 position-fixed {collapsed ? 'collapsed' : ''}">
     <div class="d-flex align-items-center gap-2 mb-4 p-3 logo-wrapper" on:click={toggleSidebar} style="cursor: pointer;">
-      <img src="/hazardwise_icon.svg" alt="HazardWise Logo" style="width: 40px; height: 40px;" />
+      <img src="{base}/hazardwise_icon.svg" alt="HazardWise Logo" style="width: 40px; height: 40px;" />
       <div class="logo-text fs-4 fw-bold label">HazardWise</div>
     </div>
 
@@ -73,7 +73,7 @@
       <li class="nav-item">
         <a
           class="nav-link {($page.url.pathname === '/workspace') ? 'active' : ''}"
-          href="/workspace"
+          href="{base}/workspace"
         >
           🏠 <span class="label ms-2">Hazards</span>
         </a>
@@ -81,7 +81,7 @@
       <li class="nav-item">
         <a
           class="nav-link {($page.url.pathname === '/about') ? 'active' : ''}"
-          href="/about"
+          href="{base}/about"
         >
           ℹ️ <span class="label ms-2">About</span>
         </a>

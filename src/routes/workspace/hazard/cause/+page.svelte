@@ -4,6 +4,7 @@
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { get } from 'svelte/store';
+  import { base } from '$app/paths';
 
   import { project } from '$lib/stores/project.js';
   import { causes } from '$lib/stores/causes.js';
@@ -46,7 +47,7 @@
   });
 
   function goBack() {
-    goto(`/workspace/hazard?id=${hazardID}`);
+    goto(base+`/workspace/hazard?id=${hazardID}`);
   }
 
   function updateExistingCause() {
@@ -92,7 +93,7 @@
   function saveAndReturn() {
     handleSave();
     // navigate back to hazard overview
-    goto(`/workspace/hazard?id=${hazardID}`);
+    goto(base+`/workspace/hazard?id=${hazardID}`);
   }
 
   // add/remove locally
@@ -105,7 +106,7 @@
 
   function newMitigation() {
     handleSave()
-    goto(
+    goto(base+
       `/workspace/hazard/mitigation?causeID=${causeID}&hazardID=${hazardID}`
     );
   }

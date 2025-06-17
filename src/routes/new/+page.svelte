@@ -2,7 +2,7 @@
 <script lang="ts">
   import { project } from '$lib/stores/project.js';
   import { goto } from '$app/navigation';
-
+import { base } from '$app/paths';
   // local form state
   let title = '';
   let description = '';
@@ -12,7 +12,7 @@
     // write to the store
     project.set({ title, description, safetyOfficer });
     console.log('Project saved:', $project);
-    goto('/workspace');
+    goto(base+'/workspace');
   }
 </script>
 

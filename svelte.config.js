@@ -16,7 +16,7 @@ const config = {
     }),
 		paths: {
       // keep your base path logic
-      base: process.env.NODE_ENV === 'production' ? '/hazardwise' : ''
+      base: '/hazardwise'
     }
     }
 };

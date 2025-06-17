@@ -9,6 +9,7 @@
   import { mitigations } from '$lib/stores/mitigations.js';
   import { goto } from '$app/navigation';
   import { HazardUtils } from '$lib/utils/hazard';
+  import { base } from '$app/paths';
   // ——————————————————————————————————————————
   // Reactive state
   // ——————————————————————————————————————————
@@ -24,7 +25,7 @@
   // ——————————————————————————————————————————
   /** Navigate to create a new hazard */
   function addHazard() {
-    goto('/workspace/hazard');
+    goto(base+'/workspace/hazard');
   }
 
   /** Remove a hazard after user confirmation */

@@ -6,6 +6,7 @@
   import { impacts } from '$lib/stores/impacts.js';
   import { get } from 'svelte/store';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
 import { DCBRisk } from '$lib/utils/dcbRisk';
 
 
@@ -70,7 +71,7 @@ $: console.log('Risk assessment:', riskResult, rawScore);
 
     if (!hazardID) {
       alert('You must specify a hazard.');
-      goto('/workspace');
+      goto(base+'/workspace');
     }
 
     if (impactID) {
@@ -84,7 +85,7 @@ $: console.log('Risk assessment:', riskResult, rawScore);
   });
 
   function goBack() {
-    goto(`/workspace/hazard?id=${hazardID}`);
+    goto(base+`/workspace/hazard?id=${hazardID}`);
   }
 
   function handleSave() {

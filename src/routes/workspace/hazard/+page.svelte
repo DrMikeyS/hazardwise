@@ -6,6 +6,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
   import { get } from 'svelte/store';
 
   import { project } from '$lib/stores/project.js';
@@ -91,26 +92,26 @@
   // Navigation helpers
   // ——————————————————————————————————————————
   function goBack() {
-    goto('/workspace');
+    goto(base+'/workspace');
   }
 
   function editCause(cid: string) {
-    goto(`/workspace/hazard/cause?hazardID=${id}&causeID=${cid}`);
+    goto(base+`/workspace/hazard/cause?hazardID=${id}&causeID=${cid}`);
   }
 
   function addCause() {
     ensureSaved(); // make sure hazard has an ID before adding children
-    goto(`/workspace/hazard/cause?hazardID=${id}`);
+    goto(base+`/workspace/hazard/cause?hazardID=${id}`);
   }
 
   function addHazardSpecificMitigation() {
     ensureSaved();
-    goto(`/workspace/hazard/mitigation?hazardID=${id}`);
+    goto(base+`/workspace/hazard/mitigation?hazardID=${id}`);
   }
 
   function addImpact() {
     ensureSaved();
-    goto(`/workspace/hazard/impact?hazardID=${id}`);
+    goto(base+`/workspace/hazard/impact?hazardID=${id}`);
   }
 
   // ——————————————————————————————————————————
@@ -212,7 +213,7 @@ function onLinkMitigation(evt) {
         h.id === id ? { ...h, description } : h
       )
     }));
-    goto('/workspace');
+    goto(base+'/workspace');
   }
 </script>
 
@@ -299,7 +300,7 @@ function onLinkMitigation(evt) {
               <div class="btn-group">
                 <button
                   class="btn btn-sm btn-outline-secondary"
-                  on:click={() => goto(`/workspace/hazard/mitigation?hazardID=${id}&mitigationID=${m.id}`)}
+                  on:click={() => goto(base+`/workspace/hazard/mitigation?hazardID=${id}&mitigationID=${m.id}`)}
                 >
                   Edit
                 </button>
@@ -351,7 +352,7 @@ function onLinkMitigation(evt) {
                     <div class="btn-group">
                       <button
                         class="btn btn-sm btn-outline-secondary"
-                        on:click={() => goto(`/workspace/hazard/impact?hazardID=${id}&impactID=${iid}`)}
+                        on:click={() => goto(base+`/workspace/hazard/impact?hazardID=${id}&impactID=${iid}`)}
                       >
                         Edit
                       </button>

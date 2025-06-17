@@ -7,6 +7,7 @@
   import { mitigations } from '$lib/stores/mitigations.js';
   import { get } from 'svelte/store';
   import { goto } from '$app/navigation';
+  import { base } from '$app/paths';
 
   let hazardID: string | null = null;
   let causeID: string | null = null;
@@ -20,7 +21,7 @@
 
     if (!hazardID && !causeID) {
       alert('You must specify either a hazard or cause.');
-      goto('/workspace');
+      goto(base+'/workspace');
     }
 
     if (mitigationID) {
@@ -32,9 +33,9 @@
   });
 
   function goBack() {
-    if (causeID) goto(`/workspace/hazard/cause?hazardID=${hazardID}&causeID=${causeID}`);
-    else if (hazardID) goto(`/workspace/hazard?id=${hazardID}`);
-    else goto('/workspace');
+    if (causeID) goto(base+`/workspace/hazard/cause?hazardID=${hazardID}&causeID=${causeID}`);
+    else if (hazardID) goto(base+`/workspace/hazard?id=${hazardID}`);
+    else goto(base+'/workspace');
   }
 
   function handleSave() {
