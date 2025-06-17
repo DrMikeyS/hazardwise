@@ -72,7 +72,7 @@
     <ul class="nav nav-pills flex-column mt-3">
       <li class="nav-item">
         <a
-          class="nav-link {($page.url.pathname === '/workspace') ? 'active' : ''}"
+          class="nav-link {($page.url.pathname === base+'/workspace') ? 'active' : ''}"
           href="{base}/workspace"
         >
           🏠 <span class="label ms-2">Hazards</span>
@@ -80,10 +80,18 @@
       </li>
       <li class="nav-item">
         <a
-          class="nav-link {($page.url.pathname === '/about') ? 'active' : ''}"
+          class="nav-link {($page.url.pathname === base+'/about') ? 'active' : ''}"
           href="{base}/about"
         >
           ℹ️ <span class="label ms-2">About</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link {($page.url.pathname === base+'/workspace/mitigations') ? 'active' : ''}"
+          href="{base}/workspace/mitigations"
+        >
+          ℹ️ <span class="label ms-2">Mitigations</span>
         </a>
       </li>
     </ul>

@@ -3,8 +3,7 @@
   // ——————————————————————————————————————————
   // Imports
   // ——————————————————————————————————————————
-  import { onMount } from 'svelte';
-  import { page } from '$app/state';
+  import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
   import { get } from 'svelte/store';
@@ -18,13 +17,24 @@
   import LinkImpactModal from '$lib/components/LinkImpactModal.svelte';
   import LinkCauseModal from '$lib/components/LinkCauseModal.svelte';
   import LinkMitigationModal from '$lib/components/LinkMitigationModal.svelte';
+  import AssignImpactLikelihood from '$lib/components/AssignImpactLikelihood.svelte';
+  import EditImpactModal from '$lib/components/EditImpactModal.svelte';
+
+  // ——————————————————————————————————————————
+  // Dynamic vars
+  // ——————————————————————————————————————————
+  $: id = $page.url.searchParams.get('id');
+  $: hazardObj = id
+  ? $project.hazards.find(h => h.id === id)
+  : null;
+   $: if (hazardObj) {
+    description = hazardObj.description;
+  } 
 
   // ——————————————————————————————————————————
   // Local state
   // ——————————————————————————————————————————
-  let id: string | null = null;
   let description = '';
-  let hazardObj: any;
   let showImpactModal = false;
   let impactSearch = '';
   let showCauseModal = false;
@@ -34,6 +44,10 @@
   let linkedMitigationIds: string[] = hazardObj?.mitigationIds || [];
   let linkedImpactIds: string[] = hazardObj?.impactIds || [];
   let linkedCauseIds: string[] = hazardObj?.causeIds || [];
+  let showAssignModal = false;
+  let selectedImpactId: string | null = null;
+  let showEditImpactModal = false;
+  let editImpactId: string | null = null;
   // ——————————————————————————————————————————
   // Reactive derived lists
   // ——————————————————————————————————————————
@@ -73,20 +87,7 @@
       !linkedMitigationIds.includes(m.id)
   );
 
-  // ——————————————————————————————————————————
-  // Lifecycle: load existing hazard if editing
-  // ——————————————————————————————————————————
-  onMount(() => {
-    id = page.url.searchParams.get('id');
-    if (id) {
-      const proj = get(project);
-      hazardObj = proj.hazards.find(h => h.id === id);
-      console.log('Loaded hazard:', hazardObj);
-      if (hazardObj) {
-        description = hazardObj.description;
-      }
-    }
-  });
+
 
   // ——————————————————————————————————————————
   // Navigation helpers
@@ -119,22 +120,30 @@
   // ——————————————————————————————————————————
   /** Link an existing impact via modal */
   function linkImpact(impactId: string) {
-    if (!id) return;
+  if (!id) return;
 
-    project.update(proj => ({
-      ...proj,
-      hazards: proj.hazards.map(h =>
-        h.id === id && !h.impactIds?.includes(impactId)
-          ? { ...h, impactIds: [...(h.impactIds || []), impactId] }
-          : h
-      )
-    }));
+  project.update(proj => ({
+    ...proj,
+    hazards: proj.hazards.map(h => {
+      if (h.id !== id) return h;
 
-    showImpactModal = false;
+      // don’t duplicate
+      const exists = h.hazardImpacts?.some(hi => hi.impactID === impactId);
+      if (exists) return h;
 
-    // Refresh local hazardObj
-    hazardObj = get(project).hazards.find(h => h.id === id);
-  }
+      return {
+        ...h,
+        hazardImpacts: [
+          ...(h.hazardImpacts || []),
+          { impactID: impactId }
+        ]
+      };
+    })
+  }));
+
+  showImpactModal = false;
+}
+
   function linkCause(cid: string) {
     if (!id) return;
     project.update(p => ({
@@ -146,7 +155,6 @@
       )
     }));
     showCauseModal = false;
-    hazardObj = get(project).hazards.find(h => h.id === id);
   }
 
  function onLinkCause(evt) {
@@ -164,16 +172,33 @@
     )
   }));
   showMitigationModal = false;
-  hazardObj = get(project).hazards.find(h => h.id === id);
 }
 function onLinkMitigation(evt) {
   linkMitigation(evt.detail);
 }
   /** Remove a linked impact */
-  function removeImpact(iid: string) {
-    if (!id) return;
-    hazardObj = HazardUtils.removeImpact(id, iid);
-  }
+function removeImpact(iid: string) {
+  if (!id) return;
+
+  // Update the project store
+  project.update(proj => ({
+    ...proj,
+    hazards: proj.hazards.map(h =>
+      h.id === id
+        ? {
+            ...h,
+            hazardImpacts: h.hazardImpacts
+              ? h.hazardImpacts.filter(hi => hi.impactID !== iid)
+              : []
+          }
+        : h
+    )
+  }));
+
+  // Refresh local hazardObj
+  const updated = get(project).hazards.find(h => h.id === id);
+  if (updated) hazardObj = updated;
+}
 
   /** Remove a linked cause */
   function removeCause(cid: string) {
@@ -220,7 +245,7 @@ function onLinkMitigation(evt) {
 <main class="container py-4">
   <!-- Back button & title -->
   <button class="btn btn-link mb-3" on:click={goBack}>← Back to Workspace</button>
-  <h1 class="mb-4">Edit Hazard</h1>
+  <h1 class="mb-4">Add/Edit Hazard</h1>
 
   <!-- Description -->
   <div class="mb-3">
@@ -331,44 +356,64 @@ function onLinkMitigation(evt) {
       <small class="text-muted">▼</small>
     </summary>
     <div class="card-body">
-      {#if hazardObj?.impactIds?.length}
-        <table class="table table-striped mb-3">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th>Likelihood</th>
-              <th>Severity</th>
-              <th class="text-end">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each hazardObj.impactIds as iid}
-              {#if $impacts.find(i => i.id === iid)}
-                <tr>
-                  <td>{$impacts.find(i => i.id === iid).description}</td>
-                  <td>{$impacts.find(i => i.id === iid).likelihood}</td>
-                  <td>{$impacts.find(i => i.id === iid).severity}</td>
-                  <td class="text-end">
-                    <div class="btn-group">
-                      <button
-                        class="btn btn-sm btn-outline-secondary"
-                        on:click={() => goto(base+`/workspace/hazard/impact?hazardID=${id}&impactID=${iid}`)}
-                      >
-                        Edit
-                      </button>
-                      <button class="btn btn-sm btn-outline-danger" on:click={() => removeImpact(iid)}>
-                        Remove
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              {/if}
-            {/each}
-          </tbody>
-        </table>
-      {:else}
-        <p class="text-muted mb-3">No impacts added yet.</p>
-      {/if}
+      <!-- Existing Impacts-->
+       {#if hazardObj?.hazardImpacts?.length}
+  <table class="table table-striped mb-3">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Likelihood</th>
+        <th>Severity</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#each hazardObj.hazardImpacts as hi}
+        {@const core = $impacts.find(i => i.id === hi.impactID)}
+        {#if core}
+          <tr>
+            <td>{core.description}</td>
+            <td>{hi.likelihood}</td>
+            <td>{core.severity}</td>
+            <td class="text-end">
+              <div class="btn-group">
+                <button
+                 class="btn btn-sm btn-outline-secondary"
+                 on:click={() => {
+                   editImpactId = hi.impactID;
+                   showEditImpactModal = true;
+                   console.log('Editing impact:', hi.impactID);
+                 }}
+               >
+                 Edit
+               </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  on:click={() => removeImpact(hi.impactID)}
+                >
+                  Remove
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-primary ms-2"
+                  on:click={() => {
+                    selectedImpactId = hi.impactID;
+                    showAssignModal = true;
+                  }}
+                >
+                  Assess
+                </button>
+              </div>
+            </td>
+          </tr>
+        {/if}
+      {/each}
+    </tbody>
+  </table>
+{:else}
+  <p class="text-muted mb-3">No impacts added yet.</p>
+{/if}
+
+
 
       <button class="btn btn-outline-primary" on:click={addImpact}>Add Impact</button>
     <button class="btn btn-outline-secondary ms-2" on:click={() => showImpactModal = true}>
@@ -406,5 +451,23 @@ function onLinkMitigation(evt) {
   on:link={onLinkMitigation}
   on:close={() => (showMitigationModal = false)}
 />
+
+{#if showAssignModal && selectedImpactId}
+  <AssignImpactLikelihood
+    hazardID={id}
+    impactID={selectedImpactId}
+    on:save={() => (showAssignModal = false)}
+    on:cancel={() => (showAssignModal = false)}
+  />
+{/if}
+
+{#if showEditImpactModal && editImpactId}
+  <EditImpactModal
+    impactID={editImpactId}
+    on:save={() => (showEditImpactModal = false)}
+    on:cancel={() => (showEditImpactModal = false)}
+  />
+{/if}
+
 
 </main>

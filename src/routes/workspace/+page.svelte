@@ -1,5 +1,5 @@
 <!-- src/routes/workspace/+page.svelte -->
- <script lang="ts">
+<script lang="ts">
   // ——————————————————————————————————————————
   // Imports
   // ——————————————————————————————————————————
@@ -8,13 +8,28 @@
   import { impacts } from '$lib/stores/impacts.js';
   import { mitigations } from '$lib/stores/mitigations.js';
   import { goto } from '$app/navigation';
-  import { HazardUtils } from '$lib/utils/hazard';
   import { base } from '$app/paths';
+  import { HazardUtils } from '$lib/utils/hazard';
+  import { assessHazardImpact } from '$lib/utils/dcbRisk';
+
   // ——————————————————————————————————————————
   // Reactive state
   // ——————————————————————————————————————————
   // Array of all hazards in the project
   $: hazards = $project.hazards || [];
+
+  // ——————————————————————————————————————————
+  // Helper to build display rows for a single hazard
+  // ——————————————————————————————————————————
+  function getDisplayedImpacts(hazard: any) {
+    return (hazard.hazardImpacts || [])
+      .map((hi: any) => {
+        const core = $impacts.find(i => i.id === hi.impactID);
+        const risk = assessHazardImpact(hi);
+        return { hi, core, risk };
+      })
+      .filter((item: any) => !!item.core);
+  }
 
   // Debug/logging (optional)
   console.log('project:', $project);
@@ -25,17 +40,16 @@
   // ——————————————————————————————————————————
   /** Navigate to create a new hazard */
   function addHazard() {
-    goto(base+'/workspace/hazard');
+    goto(base + '/workspace/hazard');
   }
 
   /** Remove a hazard after user confirmation */
   function removeHazard(id: string) {
     if (confirm('Are you sure you want to remove this hazard?')) {
-      const updated = {
-        ...$project,
-        hazards: $project.hazards.filter(h => h.id !== id)
-      };
-      project.set(updated);
+      project.update(p => ({
+        ...p,
+        hazards: p.hazards.filter(h => h.id !== id)
+      }));
     }
   }
 </script>
@@ -62,28 +76,24 @@
     {#each hazards as h}
       <details class="card mb-3">
         <summary class="card-header d-flex justify-content-between align-items-center">
-        <!-- ID, description, and (if any) highest risk badge -->
-                <div>
-                <strong>{h.id}</strong>: {h.description}
+          <div>
+            <strong>{h.id}</strong>: {h.description}
+            {#if HazardUtils.getHighestRisk(h).rating}
+              <span
+                class="badge ms-2"
+                style="background-color: {HazardUtils.getHighestRisk(h).color};"
+              >
+                Risk: {HazardUtils.getHighestRisk(h).rating}
+              </span>
+            {/if}
+          </div>
 
-                {#if HazardUtils.getHighestRisk(h).rating}
-                    <span
-                    class="badge ms-2"
-                    style="background-color: {HazardUtils.getHighestRisk(h).color};"
-                    >
-                    Risk: {HazardUtils.getHighestRisk(h).rating}
-                    </span>
-                {/if}
-                </div>
-
-
-          <!-- Edit / Remove buttons -->
           <div class="d-flex align-items-center">
             <div class="btn-group">
               <button
                 type="button"
                 class="btn btn-sm btn-outline-secondary"
-                on:click={() => goto(base+`/workspace/hazard?id=${h.id}`)}
+                on:click={() => goto(base + `/workspace/hazard?id=${h.id}`)}
               >
                 Edit
               </button>
@@ -122,7 +132,8 @@
                             {#each cause.mitigationIds as mid, i}
                               {#if $mitigations.find(m => m.id === mid)}
                                 {@const mit = $mitigations.find(m => m.id === mid)}
-                                <span>{mit.description}</span>{i < cause.mitigationIds.length - 1 ? ', ' : ''}
+                                <span>{mit.description}</span
+                                >{i < cause.mitigationIds.length - 1 ? ', ' : ''}
                               {/if}
                             {/each}
                           {:else}
@@ -139,60 +150,58 @@
             <p class="text-muted mb-3">No causes added.</p>
           {/if}
 
-            <!-- Hazard-level mitigations table -->
-            <h5 class="card-title">Hazard-Level Mitigations</h5>
-            {#if h.mitigationIds?.length}
+          <!-- Hazard-level mitigations -->
+          <h5 class="card-title">Hazard-Level Mitigations</h5>
+          {#if h.mitigationIds?.length}
             <div class="table-responsive mb-3">
-                <table class="table table-sm table-bordered">
+              <table class="table table-sm table-bordered">
                 <thead>
-                    <tr>
-                    <th>Mitigation</th>
-                    </tr>
+                  <tr><th>Mitigation</th></tr>
                 </thead>
                 <tbody>
-                    {#each h.mitigationIds as mid}
+                  {#each h.mitigationIds as mid}
                     {#if $mitigations.find(m => m.id === mid)}
-                        {@const mit = $mitigations.find(m => m.id === mid)}
-                        <tr>
-                        <td>{mit.description}</td>
-                        </tr>
+                      {@const mit = $mitigations.find(m => m.id === mid)}
+                      <tr><td>{mit.description}</td></tr>
                     {/if}
-                    {/each}
+                  {/each}
                 </tbody>
-                </table>
+              </table>
             </div>
-            {:else}
+          {:else}
             <p class="text-muted">No mitigations added.</p>
-            {/if}
+          {/if}
 
-            <!-- Impacts table -->
-            <h5 class="card-title">Impacts</h5>
-            {#if h.impactIds?.length}
+          <!-- Impacts table -->
+          <h5 class="card-title">Impacts</h5>
+          {#if getDisplayedImpacts(h).length}
             <div class="table-responsive mb-3">
-                <table class="table table-sm table-bordered">
+              <table class="table table-sm table-bordered">
                 <thead>
-                    <tr>
+                  <tr>
                     <th style="width:70%">Description</th>
                     <th style="width:30%">Risk Rating</th>
-                    </tr>
+                  </tr>
                 </thead>
                 <tbody>
-                    {#each h.impactIds as iid}
-                    {#if $impacts.find(i => i.id === iid)}
-                        {@const imp = $impacts.find(i => i.id === iid)}
-                        <tr>
-                        <td>{imp.description}</td>
-                        <td>{imp.rating}</td>
-                        </tr>
-                    {/if}
-                    {/each}
+                  {#each getDisplayedImpacts(h) as { core, risk }}
+                    <tr>
+                      <td>{core.description}</td>
+                      <td>
+                        {#if risk}
+                          {risk.rating}
+                        {:else}
+                          <em>Not assessed</em>
+                        {/if}
+                      </td>
+                    </tr>
+                  {/each}
                 </tbody>
-                </table>
+              </table>
             </div>
-            {:else}
+          {:else}
             <p class="text-muted mb-3">No impacts added.</p>
-            {/if}
-
+          {/if}
         </div>
       </details>
     {/each}

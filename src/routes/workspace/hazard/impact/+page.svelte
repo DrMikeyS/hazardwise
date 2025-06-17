@@ -16,12 +16,43 @@ import { DCBRisk } from '$lib/utils/dcbRisk';
   let severity = '';
   let likelihood = '';
 
-  const severityOptions = [
-    { value: 'Catastrophic', label: 'Catastrophic', description: 'Death or permanent major harm', class: 'table-danger' },
-    { value: 'Major', label: 'Major', description: 'Temporary major harm or permanent minor harm', class: 'table-warning' },
-    { value: 'Moderate', label: 'Moderate', description: 'Short-term harm requiring intervention', class: 'table-info' },
-    { value: 'Minor', label: 'Minor', description: 'Minimal harm, may require monitoring', class: '' },
-    { value: 'Negligible', label: 'Negligible', description: 'No significant harm', class: 'table-secondary text-white' }
+const severityOptions = [
+    {
+      value: 'Catastrophic',
+      label: 'Catastrophic',
+      description:
+        'Death; permanent life-changing incapacity; or severe injury/incapacity from which recovery is not expected in the short term. [Multiple patients]',
+      class: 'table-danger'
+    },
+    {
+      value: 'Major',
+      label: 'Major',
+      description:
+        '[Single patient:] death or permanent life-changing incapacity not recoverable. ' +
+        '[Multiple patients:] severe injury/incapacity recoverable; severe psychological trauma.',
+      class: 'table-warning'
+    },
+    {
+      value: 'Considerable',
+      label: 'Considerable',
+      description:
+        'Severe injury/incapacity from which recovery is expected in the short term; severe psychological trauma. [Single or multiple patients]',
+      class: 'table-info'
+    },
+    {
+      value: 'Significant',
+      label: 'Significant',
+      description:
+        'Minor injury or injuries from which recovery is not expected in the short term; significant psychological trauma. [Single or multiple patients]',
+      class: ''
+    },
+    {
+      value: 'Minor',
+      label: 'Minor',
+      description:
+        'Minor injury from which recovery is expected in the short term; minor psychological upset or inconvenience. [Single or multiple patients]',
+      class: 'table-secondary text-white'
+    }
   ];
 
   const likelihoodOptions = [
@@ -94,15 +125,15 @@ $: console.log('Risk assessment:', riskResult, rawScore);
     return;
   }
 
-
   const score  = rawScore;
   const rating = riskResult!.rating;
 
+  // 1. Update the core impacts store: only id, description & severity
   impacts.update(list => {
     if (impactID) {
       return list.map(i =>
         i.id === impactID
-          ? { ...i, description, severity, likelihood, score, rating }
+          ? { ...i, description, severity }
           : i
       );
     } else {
@@ -111,35 +142,38 @@ $: console.log('Risk assessment:', riskResult, rawScore);
       impactID = newId;
       return [
         ...list,
-        {
-          id: newId,
-          description,
-          severity,
-          likelihood,
-          score,
-          rating
-        }
+        { id: newId, description, severity }
       ];
     }
   });
 
-  // Link to hazard if not already
+  // 2. Link (or update) this impact on the hazard with full risk info
   if (impactID) {
     project.update(proj => ({
       ...proj,
-      hazards: proj.hazards.map(h =>
-        h.id === hazardID && !h.impactIds?.includes(impactID!)
-          ? {
-              ...h,
-              impactIds: [...(h.impactIds || []), impactID]
-            }
-          : h
-      )
+      hazards: proj.hazards.map(h => {
+        if (h.id !== hazardID) return h;
+
+        const exists = h.hazardImpacts?.some(e => e.impactID === impactID);
+        const entry = { impactID, likelihood };
+
+        return {
+          ...h,
+          hazardImpacts: exists
+            // replace existing entry
+            ? h.hazardImpacts!.map(e =>
+                e.impactID === impactID ? entry : e
+              )
+            // or append new entry
+            : [...(h.hazardImpacts || []), entry]
+        };
+      })
     }));
   }
 
   goBack();
 }
+
 
 </script>
 
@@ -162,25 +196,25 @@ $: console.log('Risk assessment:', riskResult, rawScore);
   </div>
 
   <h5 class="mt-4">Severity</h5>
-  <table class="table table-bordered align-middle">
-    <tbody>
-      {#each severityOptions as option}
-        <tr class={option.class}>
-          <td class="text-nowrap">
-            <input
-              type="radio"
-              name="severity"
-              value={option.value}
-              bind:group={severity}
-              class="form-check-input me-2"
-            />
-            <strong>{option.label}</strong>
-          </td>
-          <td>{option.description}</td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
+<table class="table table-bordered align-middle">
+  <tbody>
+    {#each severityOptions as option}
+      <tr class={option.class}>
+        <td class="text-nowrap">
+          <input
+            type="radio"
+            name="severity"
+            value={option.value}
+            bind:group={severity}
+            class="form-check-input me-2"
+          />
+          <strong>{option.label}</strong>
+        </td>
+        <td>{option.description}</td>
+      </tr>
+    {/each}
+  </tbody>
+</table>
 
   <h5 class="mt-4">Likelihood</h5>
   <table class="table table-bordered align-middle">

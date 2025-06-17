@@ -10,7 +10,7 @@
 
 ## Demo
 
-To be added…
+[Live Demo](https://drmikeys.github.io/hazardwise)
 
 ## Getting Started
 

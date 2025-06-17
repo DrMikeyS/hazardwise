@@ -1,4 +1,6 @@
 // src/lib/utils/dcbRisk.ts
+import { get } from 'svelte/store';
+import { impacts } from '$lib/stores/impacts.js';
 
 export interface RiskResult {
     score: number;
@@ -58,3 +60,39 @@ export class DCBRisk {
     return { score, rating, definition };
   }
 }
+
+  /**
+ * Given a hazardImpact entry, compute its RiskResult using DCBRisk.
+ * Returns null if likelihood or severity is not assigned or invalid.
+ */ 
+export function assessHazardImpact(
+  hi: { impactID: string; likelihood?: string }
+): RiskResult | null {
+  // Map labels to numeric levels
+  const levels: Record<string, number> = {
+    'Minor': 1,
+    'Significant': 2,
+    'Considerable': 3,
+    'Major': 4,
+    'Catastrophic': 5,
+    'Rare': 1,
+    'Unlikely': 2,
+    'Possible': 3,
+    'Likely': 4,
+    'Almost Certain': 5
+  };
+
+  const { impactID, likelihood } = hi;
+  if (!likelihood) return null;
+
+  // Lookup core impact for severity
+  const core = get(impacts).find(i => i.id === impactID);
+  if (!core || !core.severity) return null;
+
+  const likNum = levels[likelihood];
+  const sevNum = levels[core.severity];
+  if (!likNum || !sevNum) return null;
+
+  return DCBRisk.assess(likNum, sevNum);
+}
+

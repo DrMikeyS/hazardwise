@@ -4,6 +4,7 @@ import { project } from '$lib/stores/project.js';
 import { causes } from '$lib/stores/causes.js';
 import { mitigations } from '$lib/stores/mitigations.js';
 import { impacts } from '$lib/stores/impacts.js';
+import { DCBRisk } from './dcbRisk';
 
 export class HazardUtils {
   /** 
@@ -125,43 +126,61 @@ export class HazardUtils {
 }
 
 /**
- * Get the top impact’s risk info (score, rating, colour) for a hazard.
- * Returns { score, rating, color } or empty rating/color if none.
- */
-static getHighestRisk(hazard: any) {
-  // grab all impacts from the store
-  const allImpacts = get(impacts);
+   * Compute the highest risk rating among hazard impacts.
+   * Skips entries without assigned likelihood.
+   */
+  static getHighestRisk(hazard: any) {
+    const allImpacts = get(impacts);
+    const entries = hazard.hazardImpacts || [];
 
-  // pull out only those impacts linked to this hazard
-  const linked = (hazard.impactIds || [])
-    .map(id => allImpacts.find(i => i.id === id))
-    .filter((i): i is { score: number; rating: string } => !!i);
+    const levelMap: Record<string, number> = {
+      'Minor': 1,
+      'Significant': 2,
+      'Considerable': 3,
+      'Major': 4,
+      'Catastrophic': 5,
+      'Rare': 1,
+      'Unlikely': 2,
+      'Possible': 3,
+      'Likely': 4,
+      'Almost Certain': 5
+    };
 
-  // if no impacts, return empty placeholders
-  if (!linked.length) {
-    return { score: 0, rating: '', color: '' };
+    const assessed = entries
+      .map((e: any) => {
+        const { impactID, likelihood } = e;
+        if (!likelihood) return null;
+        const core = allImpacts.find(i => i.id === impactID);
+        if (!core || !core.severity) return null;
+
+        const sevNum = levelMap[core.severity];
+        const likNum = levelMap[likelihood];
+        if (!sevNum || !likNum) return null;
+
+        const { score, rating } = DCBRisk.assess(likNum, sevNum);
+        return { score, rating };
+      })
+      .filter((x): x is { score: number; rating: string } => !!x);
+
+    if (!assessed.length) {
+      return { score: 0, rating: '', color: '' };
+    }
+
+    const top = assessed.reduce((a, b) => (b.score > a.score ? b : a));
+
+    const colorMap: Record<string, string> = {
+      'Acceptable': '#28a745',
+      'Undesirable': '#ffc107',
+      'Unacceptable Without Further Mitigation': '#dc3545',
+      'Unacceptable': '#dc3545'
+    };
+
+    return {
+      score: top.score,
+      rating: top.rating,
+      color: colorMap[top.rating] ?? '#6c757d'
+    };
   }
-
-  // find the impact with the highest score
-  const top = linked.reduce((best, curr) =>
-    curr.score > best.score ? curr : best
-  );
-
-  // map ratings to colours
-  const colorMap: Record<string, string> = {
-    'Acceptable':      '#28a745',  // green
-    'Undesirable': '#ffc107',  // yellow
-    'Unacceptable':     '#dc3545',   // red,
-    'Unacceptable Without Further Mitigation':     '#dc3545'   // red,
-  };
-
-
-  return {
-    score:  top.score,
-    rating: top.rating,
-    color:  colorMap[top.rating] ?? '#6c757d'  // fallback grey
-  };
-}
 
 
 }
