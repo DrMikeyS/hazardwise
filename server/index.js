@@ -547,7 +547,7 @@ const options = {
 		<div class="error">
 			<span class="status">` + status + '</span>\n			<div class="message">\n				<h1>' + message + "</h1>\n			</div>\n		</div>\n	</body>\n</html>\n"
   },
-  version_hash: "7xa41c"
+  version_hash: "1szsm0s"
 };
 async function get_hooks() {
   let handle;
@@ -4555,7 +4555,10 @@ function create_fetch({ event, options: options2, manifest, state, get_cookie_he
             event.request.headers.get("accept-language")
           );
         }
-        const response = await internal_fetch(request, options2, manifest, state);
+        const response = await respond(request, options2, manifest, {
+          ...state,
+          depth: state.depth + 1
+        });
         const set_cookie = response.headers.get("set-cookie");
         if (set_cookie) {
           for (const str of setCookieExports.splitCookiesString(set_cookie)) {
@@ -4587,36 +4590,6 @@ function normalize_fetch_input(info, init2, url) {
     return info;
   }
   return new Request(typeof info === "string" ? new URL(info, url) : info, init2);
-}
-async function internal_fetch(request, options2, manifest, state) {
-  if (request.signal) {
-    if (request.signal.aborted) {
-      throw new DOMException("The operation was aborted.", "AbortError");
-    }
-    let remove_abort_listener = () => {
-    };
-    const abort_promise = new Promise((_, reject) => {
-      const on_abort = () => {
-        reject(new DOMException("The operation was aborted.", "AbortError"));
-      };
-      request.signal.addEventListener("abort", on_abort, { once: true });
-      remove_abort_listener = () => request.signal.removeEventListener("abort", on_abort);
-    });
-    const result = await Promise.race([
-      respond(request, options2, manifest, {
-        ...state,
-        depth: state.depth + 1
-      }),
-      abort_promise
-    ]);
-    remove_abort_listener();
-    return result;
-  } else {
-    return await respond(request, options2, manifest, {
-      ...state,
-      depth: state.depth + 1
-    });
-  }
 }
 let body;
 let etag;
