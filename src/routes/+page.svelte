@@ -1,9 +1,10 @@
 <!-- src/routes/+page.svelte -->
 <script>
   import '$lib/styles/start.css';        // styles only
-  import { startNewProject, uploadProject }
+  import { startNewProject }
     from '$lib/navigation.js';          // navigation helpers
   import { appName } from '$lib/config'; // e.g. your app name
+  import ImportData from '$lib/components/ImportData.svelte';
 </script>
 
 
@@ -16,9 +17,4 @@
     Start New Project
   </button>
 
-  <button
-    class="btn btn-secondary btn-lg w-100"
-    on:click={uploadProject}
-  >
-    Upload Existing Project
-  </button>
+<ImportData />
