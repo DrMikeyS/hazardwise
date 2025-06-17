@@ -8,6 +8,9 @@
   function toggleSidebar() {
     collapsed = !collapsed;
   }
+
+  // only show sidebar when path starts with /workspace
+  $: showSidebar = $page.url.pathname.startsWith(`${base}/workspace`);
 </script>
 
 <svelte:head>
@@ -15,111 +18,85 @@
 </svelte:head>
 
 <style>
-  .sidebar {
-    width: 250px;
-    transition: width 0.2s ease;
-  }
-
-  .sidebar.collapsed {
-    width: 70px;
-  }
-
-  .sidebar .label {
-    display: inline-block;
-    transition: opacity 0.2s ease, width 0.2s ease;
-    white-space: nowrap;
-  }
-
-  .sidebar.collapsed .label {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-  }
-
-  .sidebar .nav-link {
-    white-space: nowrap;
-  }
-
-  main {
-    transition: margin-left 0.2s ease;
-  }
-
-  .main-expanded {
-    margin-left: 250px;
-  }
-
-  .main-collapsed {
-    margin-left: 70px;
-  }
-
-  .logo-text {
-    font-family: "Jost", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-    color: #016FB8;
-  }
+  .sidebar { width: 250px; transition: width .2s ease; }
+  .sidebar.collapsed { width: 70px; }
+  .sidebar .label { display: inline-block; transition: opacity .2s ease, width .2s ease; white-space: nowrap; }
+  .sidebar.collapsed .label { opacity: 0; width: 0; overflow: hidden; }
+  main { transition: margin-left .2s ease; }
+  .main-expanded { margin-left: 250px; }
+  .main-collapsed { margin-left: 70px; }
+  .logo-text { font-family: "Jost", sans-serif; color: #016FB8; }
 </style>
 
-
 <div class="d-flex">
-  <!-- Sidebar -->
-  <div class="bg-light sidebar border-end vh-100 position-fixed {collapsed ? 'collapsed' : ''}">
-    <div class="d-flex align-items-center gap-2 mb-4 p-3 logo-wrapper" on:click={toggleSidebar} style="cursor: pointer;">
-      <img src="{base}/hazardwise_icon.svg" alt="HazardWise Logo" style="width: 40px; height: 40px;" />
-      <div class="logo-text fs-4 fw-bold label">HazardWise</div>
+  {#if showSidebar}
+    <!-- Sidebar -->
+    <div class="bg-light sidebar border-end vh-100 position-fixed {collapsed ? 'collapsed' : ''}">
+      <div
+        class="d-flex align-items-center gap-2 mb-4 p-3 logo-wrapper"
+        on:click={toggleSidebar}
+        style="cursor: pointer;"
+      >
+        <img
+          src="{base}/hazardwise_icon.svg"
+          alt="HazardWise Logo"
+          style="width:40px; height:40px;"
+        />
+        <div class="logo-text fs-4 fw-bold label">HazardWise</div>
+      </div>
+
+      <ul class="nav nav-pills flex-column mt-3">
+        <li class="nav-item">
+          <a
+            class="nav-link { $page.url.pathname === `${base}/workspace` ? 'active' : '' }"
+            href="{base}/workspace"
+          >
+            ⚠️ <span class="label ms-2">Hazards</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link { $page.url.pathname === `${base}/workspace/mitigations` ? 'active' : '' }"
+            href="{base}/workspace/mitigations"
+          >
+            ⚙️ <span class="label ms-2">Manage Mitigations</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link { $page.url.pathname === `${base}/workspace/impacts` ? 'active' : '' }"
+            href="{base}/workspace/impacts"
+          >
+            ⚡️ <span class="label ms-2">Manage Impacts</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link { $page.url.pathname === `${base}/workspace/project` ? 'active' : '' }"
+            href="{base}/workspace/project"
+          >
+            📊 <span class="label ms-2">Project Details</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link { $page.url.pathname === `${base}/workspace/export` ? 'active' : '' }"
+            href="{base}/workspace/export"
+          >
+            📤 <span class="label ms-2">Export Tools</span>
+          </a>
+        </li>
+      </ul>
     </div>
+  {/if}
 
-<ul class="nav nav-pills flex-column mt-3">
-  <li class="nav-item">
-    <a
-      class="nav-link { $page.url.pathname === `${base}/workspace` ? 'active' : '' }"
-      href="{base}/workspace"
-    >
-      ⚠️  <span class="label ms-2">Hazards</span>
-    </a>
-  </li>
-
-  <li class="nav-item">
-    <a
-      class="nav-link { $page.url.pathname === `${base}/workspace/mitigations` ? 'active' : '' }"
-      href="{base}/workspace/mitigations"
-    >
-      ⚙️ <span class="label ms-2">Manage Mitigations</span>
-    </a>
-  </li>
-
-  
-
-  <li class="nav-item">
-    <a
-      class="nav-link { $page.url.pathname === `${base}/workspace/impacts` ? 'active' : '' }"
-      href="{base}/workspace/impacts"
-    >
-      ⚡️ <span class="label ms-2">Manage Impacts</span>
-    </a>
-  </li>
-
-  <li class="nav-item">
-    <a
-      class="nav-link { $page.url.pathname === `${base}/workspace/project` ? 'active' : '' }"
-      href="{base}/workspace/project"
-    >
-      📊 <span class="label ms-2">Project Details</span>
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      class="nav-link { $page.url.pathname === `${base}/workspace/export` ? 'active' : '' }"
-      href="{base}/workspace/export"
-    >
-      📤 <span class="label ms-2">Export Tools</span>
-    </a>
-  </li>
-</ul>
-</div>
-  <!-- Main content -->
-  <main class="py-4 px-3 flex-grow-1 {collapsed ? 'main-collapsed' : 'main-expanded'}">
+  <!-- Main content: shift only when sidebar is shown -->
+  <main
+    class="py-4 px-3 flex-grow-1
+      {showSidebar
+         ? (collapsed ? 'main-collapsed' : 'main-expanded')
+         : ''}"
+  >
     <slot />
   </main>
 </div>
-
