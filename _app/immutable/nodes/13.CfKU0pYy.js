@@ -1,0 +1,1 @@
+import{f as t,a as n}from"../chunks/ByznTNP7.js";import"../chunks/C_lvEoKA.js";var s=t('<main class="container py-4"><h1 class="mb-4">Project details</h1> <p class="text-muted">This section is under construction. Check back soon!</p></main>');function i(a){var o=s();n(a,o)}export{i as component};
