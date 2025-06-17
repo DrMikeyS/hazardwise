@@ -12,7 +12,7 @@ const config = {
       assets: 'build',
 
       // serve index.html for any path not otherwise found
-      fallback: 'index.html'
+      fallback: '404.html'
     }),
 		paths: {
       // keep your base path logic
