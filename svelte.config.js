@@ -1,13 +1,20 @@
 // svelte.config.js
-import adapter from '@sveltejs/adapter-static';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import adapter from '@sveltejs/adapter-node';
+import preprocess from 'svelte-preprocess';
 
-export default {
-  preprocess: vitePreprocess(),
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+  preprocess: preprocess(),
   kit: {
-    // use the static adapter with all the defaults
-    adapter: adapter(),
-    // remove any custom base path unless you really need it
-    // paths: { base: '' },
+    adapter: adapter({
+      // out: 'build',
+      // precompress: false,
+      // env: { host: 'HOST', port: 'PORT' }
+    }),
+    paths: {
+      base: process.env.NODE_ENV === 'production' ? '/hazardwise' : ''
+    }
   }
 };
+
+export default config;
