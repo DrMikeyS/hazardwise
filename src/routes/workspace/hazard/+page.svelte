@@ -19,6 +19,13 @@
   import LinkMitigationModal from '$lib/components/LinkMitigationModal.svelte';
   import AssignImpactLikelihood from '$lib/components/AssignImpactLikelihood.svelte';
   import EditImpactModal from '$lib/components/EditImpactModal.svelte';
+  import { DCBRisk } from '$lib/utils/dcbRisk';
+
+
+
+
+
+
 
   // ——————————————————————————————————————————
   // Dynamic vars
@@ -48,6 +55,19 @@
   let selectedImpactId: string | null = null;
   let showEditImpactModal = false;
   let editImpactId: string | null = null;
+  const levels = {
+  'Catastrophic': 5, 'Major': 4, 'Considerable': 3,
+  'Significant': 2, 'Minor': 1,
+  'Almost Certain': 5, 'Likely': 4, 'Possible': 3,
+  'Unlikely': 2, 'Rare': 1
+};
+const riskBadgeClasses = {
+  1: 'bg-success text-white',
+  2: 'bg-info text-dark',
+  3: 'bg-warning text-dark',
+  4: 'bg-danger text-white',
+  5: 'bg-danger text-white'
+};
   // ——————————————————————————————————————————
   // Reactive derived lists
   // ——————————————————————————————————————————
@@ -240,6 +260,14 @@ function removeImpact(iid: string) {
     }));
     goto(base+'/workspace/hazards');
   }
+
+  //Other helpers
+
+  function assessRisk(likelihood: string, severity: string) {
+  const l = levels[likelihood] ?? 0;
+  const s = levels[severity]  ?? 0;
+  return l && s ? DCBRisk.assess(l, s) : null;
+}
 </script>
 
 <main class="container py-4">
@@ -364,6 +392,7 @@ function removeImpact(iid: string) {
         <th>Description</th>
         <th>Likelihood</th>
         <th>Severity</th>
+        <th>Risk Rating</th>
         <th class="text-end">Actions</th>
       </tr>
     </thead>
@@ -375,6 +404,18 @@ function removeImpact(iid: string) {
             <td>{core.description}</td>
             <td>{hi.likelihood}</td>
             <td>{core.severity}</td>
+            <td>
+  {#if hi.likelihood}
+    {@const rr = DCBRisk.assess(levels[hi.likelihood], levels[core.severity])}
+    <span class={`badge ${riskBadgeClasses[rr.score]} me-2`}>
+      {rr.rating} ({rr.score})
+    </span>
+  {:else}
+    <span class="text-muted">Unassessed</span>
+  {/if}
+</td>
+
+
             <td class="text-end">
               <div class="btn-group">
                 <button
@@ -387,21 +428,22 @@ function removeImpact(iid: string) {
                >
                  Edit
                </button>
+               <button
+                  class="btn btn-sm btn-outline-primary"
+                  on:click={() => {
+                    selectedImpactId = hi.impactID;
+                    showAssignModal = true;
+                  }}
+                >
+                  Assess Likelihood
+                </button>
                 <button
                   class="btn btn-sm btn-outline-danger"
                   on:click={() => removeImpact(hi.impactID)}
                 >
                   Remove
                 </button>
-                <button
-                  class="btn btn-sm btn-outline-primary ms-2"
-                  on:click={() => {
-                    selectedImpactId = hi.impactID;
-                    showAssignModal = true;
-                  }}
-                >
-                  Assess
-                </button>
+                
               </div>
             </td>
           </tr>

@@ -1,5 +1,4 @@
-<!-- lib/components/AssignImpactLikelihood.svelte-->
- <script lang="ts">
+<script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
   import { impacts } from '$lib/stores/impacts.js';
   import { project } from '$lib/stores/project.js';
@@ -37,10 +36,27 @@
     'Rare': 1
   };
 
+  const riskBadgeClasses = {
+    1: 'bg-success text-white',
+    2: 'bg-info text-dark',
+    3: 'bg-warning text-dark',
+    4: 'bg-danger text-white',
+    5: 'bg-danger text-white'
+  };
+
   $: rawScore = (levels[severity] || 0) * (levels[likelihood] || 0);
   $: riskResult = (levels[severity] && levels[likelihood])
     ? DCBRisk.assess(levels[likelihood], levels[severity])
     : null;
+
+  // Likelihood options for radio selection
+  const likelihoodOptions = [
+    { value: 'Almost Certain', label: 'Almost Certain', description: 'Expected to occur frequently', class: 'table-danger' },
+    { value: 'Likely', label: 'Likely', description: 'Will probably occur occasionally', class: 'table-warning' },
+    { value: 'Possible', label: 'Possible', description: 'Could occur but uncommon', class: 'table-info' },
+    { value: 'Unlikely', label: 'Unlikely', description: 'Rare but possible', class: '' },
+    { value: 'Rare', label: 'Rare', description: 'Exceptional circumstances only', class: 'table-secondary text-white' }
+  ];
 
   function save() {
     if (!likelihood) {
@@ -48,16 +64,13 @@
       return;
     }
 
-    const score = rawScore;
-    const rating = riskResult?.rating || '';
-
     project.update(proj => ({
       ...proj,
       hazards: proj.hazards.map(h => {
         if (h.id !== hazardID) return h;
 
         const existing = h.hazardImpacts?.some(e => e.impactID === impactID);
-        const newEntry = { impactID, likelihood};
+        const newEntry = { impactID, likelihood };
 
         return {
           ...h,
@@ -92,29 +105,43 @@
 
       <div class="modal-body">
         <div class="mb-3">
-          <label class="form-label">Description</label>
+          <label class="form-label">Impact Description</label>
           <textarea class="form-control" rows="2" disabled bind:value={description}></textarea>
         </div>
         <div class="mb-3">
           <label class="form-label">Severity</label>
           <input class="form-control" disabled value={severity} />
         </div>
-
-        <div class="mb-3">
-          <label class="form-label">Likelihood</label>
-          <select class="form-select" bind:value={likelihood}>
-            <option value="" disabled>Select likelihood</option>
-            {#each ['Almost Certain','Likely','Possible','Unlikely','Rare'] as option}
-              <option value={option}>{option}</option>
+        <div class="mb-3"></div>
+        <label class="form-label">Likelihood</label>
+        <p>How likely is it that this impact will occur <strong>due to this hazard</strong> and <strong>with the planned mitigations</strong> in place?</p>
+        <table class="table table-bordered align-middle">
+          <tbody>
+            {#each likelihoodOptions as option}
+              <tr class={option.class}>
+                <td class="text-nowrap">
+                  <input
+                    type="radio"
+                    name="likelihood"
+                    value={option.value}
+                    bind:group={likelihood}
+                    class="form-check-input me-2"
+                  />
+                  <strong>{option.label}</strong>
+                </td>
+                <td>{option.description}</td>
+              </tr>
             {/each}
-          </select>
-        </div>
+          </tbody>
+        </table>
 
         {#if riskResult}
           <div class="mb-3">
             <label class="form-label">Risk Rating</label>
             <div class="d-flex align-items-center">
-              <span class="badge bg-secondary me-2">{riskResult.rating}</span>
+             <span class={`badge ${riskBadgeClasses[riskResult.score]} me-2`}>
+        {riskResult.rating}
+      </span>
               <small>{riskResult.definition} (Score: {riskResult.score})</small>
             </div>
           </div>

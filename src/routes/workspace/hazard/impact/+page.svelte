@@ -199,6 +199,7 @@ $: console.log('Risk assessment:', riskResult, rawScore);
   </div>
 
   <h5 class="mt-4">Severity</h5>
+  <p>How badly could someone (or some people) be hurt if this impact occured?</p>
 <table class="table table-bordered align-middle">
   <tbody>
     {#each severityOptions as option}
@@ -220,6 +221,9 @@ $: console.log('Risk assessment:', riskResult, rawScore);
 </table>
 
   <h5 class="mt-4">Likelihood</h5>
+  <p>How likely is it that this impact will occur <strong>due to this hazard</strong> and 
+    <strong>with the planned mitigations</strong> in place?</p>
+  
   <table class="table table-bordered align-middle">
     <tbody>
       {#each likelihoodOptions as option}

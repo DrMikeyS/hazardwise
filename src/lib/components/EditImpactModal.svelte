@@ -1,21 +1,51 @@
-<!-- lib/components/EditImpactModal.svelte -->
- <script lang="ts">
+<script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
   import { impacts } from '$lib/stores/impacts.js';
   import { get } from 'svelte/store';
 
   export let impactID: string;
   const dispatch = createEventDispatcher();
- console.log(`Editing impact in modal: ${impactID}`);
   let description = '';
   let severity = '';
 
+  // Severity options with descriptions and classes matching impact page
   const severityOptions = [
-    'Catastrophic',
-    'Major',
-    'Considerable',
-    'Significant',
-    'Minor'
+    {
+      value: 'Catastrophic',
+      label: 'Catastrophic',
+      description:
+        'Death; permanent life-changing incapacity; or severe injury/incapacity from which recovery is not expected in the short term. [Multiple patients]',
+      class: 'table-danger'
+    },
+    {
+      value: 'Major',
+      label: 'Major',
+      description:
+        '[Single patient:] death or permanent life-changing incapacity not recoverable. ' +
+        '[Multiple patients:] severe injury/incapacity recoverable; severe psychological trauma.',
+      class: 'table-warning'
+    },
+    {
+      value: 'Considerable',
+      label: 'Considerable',
+      description:
+        'Severe injury/incapacity from which recovery is expected in the short term; severe psychological trauma. [Single or multiple patients]',
+      class: 'table-info'
+    },
+    {
+      value: 'Significant',
+      label: 'Significant',
+      description:
+        'Minor injury or injuries from which recovery is not expected in the short term; significant psychological trauma. [Single or multiple patients]',
+      class: ''
+    },
+    {
+      value: 'Minor',
+      label: 'Minor',
+      description:
+        'Minor injury from which recovery is expected in the short term; minor psychological upset or inconvenience. [Single or multiple patients]',
+      class: 'table-secondary text-white'
+    }
   ];
 
   onMount(() => {
@@ -63,26 +93,27 @@
           ></textarea>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">Severity</label>
-          <div>
+        <h5 class="mt-4">Severity</h5>
+        <p>How badly could someone (or some people) be hurt if this impact occurred?</p>
+        <table class="table table-bordered align-middle">
+          <tbody>
             {#each severityOptions as option}
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="impactSeverity"
-                  id={option}
-                  value={option}
-                  bind:group={severity}
-                />
-                <label class="form-check-label" for={option}>
-                  {option}
-                </label>
-              </div>
+              <tr class={option.class}>
+                <td class="text-nowrap">
+                  <input
+                    type="radio"
+                    name="impactSeverity"
+                    value={option.value}
+                    bind:group={severity}
+                    class="form-check-input me-2"
+                  />
+                  <strong>{option.label}</strong>
+                </td>
+                <td>{option.description}</td>
+              </tr>
             {/each}
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
 
       <div class="modal-footer">
