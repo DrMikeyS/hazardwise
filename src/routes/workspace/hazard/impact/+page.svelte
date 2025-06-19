@@ -105,7 +105,7 @@ $: console.log('Risk assessment:', riskResult, rawScore);
 
     if (!hazardID) {
       alert('You must specify a hazard.');
-      goto(base+'/workspace');
+      goto(base+'/workspace/hazards');
     }
 
     if (impactID) {

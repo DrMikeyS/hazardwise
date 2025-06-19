@@ -60,6 +60,14 @@
             class="nav-link { $page.url.pathname === `${base}/workspace` ? 'active' : '' }"
             href="{base}/workspace"
           >
+            🏠 <span class="label ms-2">Overview</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link { $page.url.pathname === `${base}/workspace/hazards` ? 'active' : '' }"
+            href="{base}/workspace/hazards"
+          >
             ⚠️ <span class="label ms-2">Hazards</span>
           </a>
         </li>

@@ -21,7 +21,7 @@
 
     if (!hazardID && !causeID) {
       alert('You must specify either a hazard or cause.');
-      goto(base+'/workspace');
+      goto(base+'/workspace/hazards');
     }
 
     if (mitigationID) {
@@ -35,7 +35,7 @@
   function goBack() {
     if (causeID) goto(base+`/workspace/hazard/cause?hazardID=${hazardID}&causeID=${causeID}`);
     else if (hazardID) goto(base+`/workspace/hazard?id=${hazardID}`);
-    else goto(base+'/workspace');
+    else goto(base+'/workspace/hazards');
   }
 
   function handleSave() {

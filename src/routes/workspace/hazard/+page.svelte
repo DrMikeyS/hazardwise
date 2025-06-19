@@ -238,7 +238,7 @@ function removeImpact(iid: string) {
         h.id === id ? { ...h, description } : h
       )
     }));
-    goto(base+'/workspace');
+    goto(base+'/workspace/hazards');
   }
 </script>
 
