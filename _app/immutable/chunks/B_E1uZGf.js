@@ -1,1 +1,0 @@
-import{w as p}from"./C4JyVH-E.js";import{a as s}from"./Cz0CWeBA.js";function c(t,i){const e=s.get(t),a=e?JSON.parse(e):i,r=p(a);return r.subscribe(o=>s.set(t,JSON.stringify(o),{expires:7,sameSite:"strict",path:"/"})),r}const m=c("hazardwise-project",{title:"",description:"",safetyOfficer:"",hazards:[]});export{m as p};
