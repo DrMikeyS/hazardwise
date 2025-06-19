@@ -1,5 +1,7 @@
 <script>
   import {base} from '$app/paths';
+  import {project} from '$lib/stores/project.js';
+  $project
   export let progress={
       clinicalSafetyOfficer: true,
       projectDetails: false,
@@ -49,8 +51,9 @@
 </script>
 
 <main class="container mt-4">
-  <h1 class="mb-4">Overview</h1>
-    <h3>DCB0160 Clinical Safety Case Progress</h3>
+  <!-- Project title -->
+  <h1 class="mb-4">{ $project.title || 'Untitled Project' }</h1>
+    <h3 class="mb-3">DCB0160 Clinical Safety Case Progress</h3>
   <table class="table table-bordered">
     <thead class="thead-light">
       <tr>

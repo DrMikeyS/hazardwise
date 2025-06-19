@@ -56,7 +56,7 @@
 
 <main class="container py-4">
   <!-- Project title -->
-  <h1 class="mb-3">{ $project.title || 'Untitled Project' }</h1>
+  <h1 class="mb-3">Hazard Log</h1>
 
   {#if hazards.length === 0}
     <!-- Empty state -->
