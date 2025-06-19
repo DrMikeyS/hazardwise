@@ -1,0 +1,1 @@
+import{w as p}from"./BwX_BP9M.js";import{a as r}from"./Cz0CWeBA.js";function c(s,e){const t=r.get(s),a=t?JSON.parse(t):e,i=p(a);return i.subscribe(o=>r.set(s,JSON.stringify(o),{expires:7,sameSite:"strict",path:"/"})),i}const f=c("hazardwise-impacts",[]);export{f as i};

@@ -1,1 +1,0 @@
-import{w as n}from"./Doyjl1dZ.js";import{a as r}from"./Cz0CWeBA.js";function m(t,e){const s=r.get(t),a=s?JSON.parse(s):e,i=n(a);return i.subscribe(o=>r.set(t,JSON.stringify(o),{expires:7,sameSite:"strict",path:"/"})),i}const f=m("hazardwise-mitigations",[]);export{f as m};
