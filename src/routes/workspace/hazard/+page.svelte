@@ -113,7 +113,7 @@ const riskBadgeClasses = {
   // Navigation helpers
   // ——————————————————————————————————————————
   function goBack() {
-    goto(base+'/workspace');
+    goto(base+'/workspace/hazards');
   }
 
   function editCause(cid: string) {
