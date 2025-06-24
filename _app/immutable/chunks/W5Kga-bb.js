@@ -1,1 +1,0 @@
-import{w as c}from"./BwX_BP9M.js";import{a as r}from"./Cz0CWeBA.js";function n(s,a){const t=r.get(s),i=t?JSON.parse(t):a,e=c(i);return e.subscribe(o=>r.set(s,JSON.stringify(o),{expires:7,sameSite:"strict",path:"/"})),e}const m=n("hazardwise-causes",[]);export{m as c};
