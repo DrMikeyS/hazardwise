@@ -196,6 +196,9 @@ $: console.log('Risk assessment:', riskResult, rawScore);
       bind:value={description}
       placeholder="e.g. Incorrect clinical advice leads to unsafe prescription"
     ></textarea>
+    <div class="form-text">
+      Describe the impact of this hazard on patients, staff or the service. e.g. "Person slips and suffers an injury.".
+    </div>
   </div>
 
   <h5 class="mt-4">Severity</h5>

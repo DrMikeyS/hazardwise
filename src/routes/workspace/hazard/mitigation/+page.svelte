@@ -103,7 +103,7 @@
       placeholder="e.g. Add human review step"
     ></textarea>
     <div class="form-text">
-      A mitigation is an action or control that reduces the likelihood or impact of a hazard or cause.
+      A mitigation is an action or control that reduces the likelihood or impact of a hazard or cause. e.g. "Staff are advised not to carry uncovered drinks to prevent spills.".
     </div>
   </div>
 

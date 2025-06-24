@@ -133,7 +133,7 @@
       placeholder="Describe a factor that could lead to this hazard"
     ></textarea>
     <div class="form-text">
-      A cause is a factor or condition that could contribute to the hazard occurring.
+      A cause is a factor or condition that could contribute to the hazard occurring. e.g. "A drink is spilled leaving a puddle of liquid that goes unnoticed."
     </div>
   </div>
 

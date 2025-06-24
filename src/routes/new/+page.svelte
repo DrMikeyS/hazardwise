@@ -5,20 +5,19 @@
 import { base } from '$app/paths';
   // local form state
   let title = '';
-  let description = '';
-  let safetyOfficer = '';
 
   function handleSubmit() {
     // write to the store
-    project.set({ title, description, safetyOfficer });
+    project.set({ title });
     console.log('Project saved:', $project);
     goto(base+'/workspace');
   }
 </script>
-
+<main class="d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+ 
 <h1 class="mb-4">Start New Project</h1>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form on:submit|preventDefault={handleSubmit} class="w-100" style="max-width: 600px;">
   <div class="mb-3">
     <label for="projectTitle" class="form-label">
       Project Title <span class="text-danger">*</span>
@@ -28,41 +27,14 @@ import { base } from '$app/paths';
       type="text"
       bind:value={title}
       required
-      class="form-control"
+      class="form-control w-100"
       placeholder="Enter project title"
     />
-  </div>
-
-  <div class="mb-3">
-    <label for="projectDescription" class="form-label">
-      Project Description
-    </label>
-    <textarea
-      id="projectDescription"
-      bind:value={description}
-      rows="3"
-      class="form-control"
-      placeholder="Use plain language understandable to the public"
-    ></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label for="safetyOfficer" class="form-label">
-      Clinical Safety Officer
-    </label>
-    <input
-      id="safetyOfficer"
-      type="text"
-      bind:value={safetyOfficer}
-      class="form-control"
-      placeholder="Name of the responsible clinician"
-    />
-    <div class="form-text">
-      Tip: This is the clinician taking responsibility for the clinical safety process.
-    </div>
   </div>
 
   <button type="submit" class="btn btn-primary">
     Create Project
   </button>
 </form>
+</main>
+

@@ -285,7 +285,7 @@ function removeImpact(iid: string) {
       bind:value={description}
       placeholder="Describe what might go wrong"
     ></textarea>
-    <div class="form-text">A hazard is anything that could potentially cause harm.</div>
+    <div class="form-text">A hazard is anything that could potentially cause harm. e.g. "A person slips on a wet floor."</div>
   </div>
 
   <!-- Causes section -->
