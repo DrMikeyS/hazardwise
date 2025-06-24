@@ -183,4 +183,14 @@ export class HazardUtils {
   }
 
 
+static getRiskColor(riskRating){
+   const colorMap= {
+      'Acceptable': '#28a745',
+      'Undesirable': '#ffc107',
+      'Unacceptable Without Further Mitigation': '#dc3545',
+      'Unacceptable': '#dc3545'
+    };
+    return colorMap[riskRating] || '#6c757d'; // Default to gray if not found
+}
+
 }
