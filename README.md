@@ -1,6 +1,6 @@
 # HazardWise
 
-*A simple, MIT-licensed tool for managing clinical safety hazards, risks, and mitigations.*
+*Empowering busy clinicians to complete the DCB0160 process in minutes—create hazard logs, quantify risks, and generate ready-to-share mitigation reports for your team.*
 
 ## Features
 
