@@ -12,7 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
-		"deploy": "npm run build && npx gh-pages -d build"
+		"deploy": "npm run build && npm run publish",
+		"publish": "bash scripts/deploy-gh-pages.sh"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",

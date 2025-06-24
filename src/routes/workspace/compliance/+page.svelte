@@ -155,5 +155,17 @@
         </div>
       {/each}
     </div>
+    <!-- Vendor compliance sign-off -->
+
+  <input
+    class="form-check-input"
+    type="checkbox"
+    id="vendor-compliance-reviewed"
+    checked={!!compliance['vendorComplianceReviewed']}
+    on:change={(e) => toggle('vendorComplianceReviewed', e.currentTarget.checked)}
+  />
+  <label class="form-check-label" for="vendor-compliance-reviewed">
+    I confirm the vendor compliance review is complete and I am happy to sign off.
+  </label>
   </form>
 </main>
