@@ -20,14 +20,6 @@ export const project = persistedCookie('hazardwise-project', {
   title: '',
   description: '',
   safetyOfficer: '',
-  alternatives: '',
-  reportSections: {
-    introduction: '',
-    purpose: '',
-    governance: '',
-    riskOverview: '',
-    conclusion: ''
-  },
   hazards: [
     // example hazard:
     // {
