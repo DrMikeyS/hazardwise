@@ -2,7 +2,14 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   export let show = false;
-  export let impacts = [];
+  type ImpactItem = {
+    id: string;
+    description: string;
+    likelihood?: string;
+    severity?: string;
+  };
+
+  export let impacts: ImpactItem[] = [];
   export let search = '';
   const dispatch = createEventDispatcher();
 
@@ -24,7 +31,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Link Existing Impact</h5>
-          <button type="button" class="btn-close" on:click={handleClose}></button>
+          <button type="button" class="btn-close" aria-label="Close" on:click={handleClose}></button>
         </div>
         <div class="modal-body">
           <input

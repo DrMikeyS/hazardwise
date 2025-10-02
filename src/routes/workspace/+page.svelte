@@ -9,6 +9,8 @@
   $: {
     const p = $project;
     const m = $mitigations;
+    const sections = p.reportSections ?? {};
+    const narrativeProvided = Object.values(sections).some(value => (value ?? '').toString().trim().length > 0);
     console.log('mitigations', m);
     const hazardCount = p.hazards?.length ?? 0;
 
@@ -18,7 +20,8 @@
       hazardLogRiskAssessment: String(hazardCount)+" Hazards Identified",
       mitigationsInPlace: String(m.length)+" Mitigations Identified",
       vendorComplianceReview: Boolean(p.compliance?.vendorComplianceReviewed),
-      alternativeOptionsAnalysis: Boolean(p.alternatives?.trim())
+      alternativeOptionsAnalysis: Boolean(p.alternatives?.trim()),
+      clinicalSafetyNarrative: narrativeProvided
     };
   }
 
@@ -63,6 +66,13 @@
       title: 'Consideration of Risks/Benefits of Alternative Options',
       description:
         'Evaluation of potential alternatives, including risk-benefit analysis to justify selected solutions.',
+      link: base + '/workspace/project'
+    },
+    {
+      key: 'clinicalSafetyNarrative',
+      title: 'Clinical Safety Case Narrative Prepared',
+      description:
+        'Draft the introduction, governance, risk summary, and conclusion text that will appear in the exported safety case report.',
       link: base + '/workspace/project'
     }
   ];

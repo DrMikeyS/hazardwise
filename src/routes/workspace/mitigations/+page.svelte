@@ -1,26 +1,25 @@
 <!-- src/routes/mitigations/+page.svelte -->
-<script>
+<script lang="ts">
   import { mitigations } from '$lib/stores/mitigations.js';
-  import { base } from '$app/paths';
   import EditMitigationModal from '$lib/components/EditMitigationModal.svelte';
-  /** 
-   * Prompt the user and remove a mitigation by id 
+  /**
+   * Prompt the user and remove a mitigation by id
    */
-  function removeMitigation(id) {
+  function removeMitigation(id: string) {
     if (confirm('Are you sure you want to remove this mitigation?')) {
       mitigations.update(list => list.filter(item => item.id !== id));
     }
   }
 
   let showModal = false;
-  let selectedId = null;
+  let selectedId: string | null = null;
 
-  function openEditor(id) {
+  function openEditor(id: string) {
     selectedId = id;
     showModal = true;
   }
 
-  function handleSave(event) {
+  function handleSave() {
     // your modal already updated the store
     showModal = false;
   }
@@ -30,7 +29,7 @@
   }
 
   // Toggle “implemented” on/off
-  function toggleImplemented(id, isImplemented) {
+  function toggleImplemented(id: string, isImplemented: boolean) {
     mitigations.update(list =>
       list.map(item =>
         item.id === id ? { ...item, implemented: isImplemented } : item
@@ -60,7 +59,9 @@
             <input
               type="checkbox"
               checked={m.implemented}
-              on:change={e => toggleImplemented(m.id, e.target.checked)}
+              on:change={event =>
+                toggleImplemented(m.id, (event.currentTarget as HTMLInputElement).checked)
+              }
               aria-label="Mark {m.id} implemented"
             />
           </td>
@@ -87,7 +88,7 @@
 
 {#if showModal}
   <EditMitigationModal
-    mitigationID={selectedId}
+    mitigationID={selectedId ?? ''}
     on:save={handleSave}
     on:cancel={handleCancel}
   />
