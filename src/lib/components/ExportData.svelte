@@ -6,7 +6,7 @@
   import { impacts } from '$lib/stores/impacts.js';
   import { HazardUtils } from '$lib/utils/hazard';
   import { assessHazardImpact } from '$lib/utils/dcbRisk';
-  import { downloadDocx, type DocxParagraph } from '$lib/utils/docxExport';
+  import { downloadDocx, type DocxContentBlock, type DocxHighlight } from '$lib/utils/docxExport';
   import { base } from '$app/paths';
 
   type HazardImpact = {
@@ -91,20 +91,25 @@
   }
 
   function appendMultilineText(
-    paragraphs: DocxParagraph[],
+    blocks: DocxContentBlock[],
     value: string,
     fallbackText?: string
   ): void {
     if (value.trim()) {
       for (const line of value.split(/\r?\n/)) {
-        paragraphs.push({ text: line });
+        blocks.push({ text: line, style: 'Normal' });
       }
       return;
     }
 
     if (fallbackText) {
-      paragraphs.push({ text: fallbackText });
+      blocks.push({ text: fallbackText, style: 'Normal' });
     }
+  }
+
+  function getRiskHighlight(rating: string): DocxHighlight | undefined {
+    if (!rating) return undefined;
+    return rating === 'Acceptable' ? 'green' : 'yellow';
   }
 
   function getAllMitigationIdsForHazard(hazard: Hazard, causeMap: Map<string, Cause>): string[] {
@@ -115,7 +120,7 @@
     return Array.from(new Set([...hazardMitigationIds, ...causeMitigationIds]));
   }
 
-  function buildHazardLogParagraphs(): DocxParagraph[] {
+  function buildHazardLogParagraphs(): DocxContentBlock[] {
     const projectData = get(project);
     const hazardItems = (projectData.hazards || []) as Hazard[];
     const causeItems = get(causes) as Cause[];
@@ -126,7 +131,7 @@
     const mitigationMap = mapById(mitigationItems);
     const impactMap = mapById(impactItems);
 
-    const paragraphs: DocxParagraph[] = [
+    const paragraphs: DocxContentBlock[] = [
       { text: `Hazard Log - ${getProjectTitle()}`, bold: true },
       { text: `Generated: ${new Date().toLocaleString()}` },
       { text: '' }
@@ -204,10 +209,10 @@
     return paragraphs;
   }
 
-  function buildMitigationListParagraphs(): DocxParagraph[] {
+  function buildMitigationListParagraphs(): DocxContentBlock[] {
     const mitigationItems = get(mitigations) as Mitigation[];
 
-    const paragraphs: DocxParagraph[] = [
+    const paragraphs: DocxContentBlock[] = [
       { text: `Mitigation List - ${getProjectTitle()}`, bold: true },
       { text: `Generated: ${new Date().toLocaleString()}` },
       { text: '' }
@@ -229,7 +234,7 @@
     return paragraphs;
   }
 
-  function buildClinicalSafetyCaseReportParagraphs(): DocxParagraph[] {
+  function buildClinicalSafetyCaseReportParagraphs(): DocxContentBlock[] {
     const projectData = get(project) as ProjectData;
     const hazardItems = (projectData.hazards || []) as Hazard[];
     const section6Text = getCaseReportSectionValue(projectData, 'riskAssessmentAndMitigations');
@@ -245,92 +250,131 @@
       getCaseReportSectionValue(projectData, 'conclusionNarrative') ||
       getCaseReportSectionValue(projectData, 'conclusion');
 
-    const paragraphs: DocxParagraph[] = [
-      { text: `Clinical Safety Case Report - ${getProjectTitle()}`, bold: true },
-      { text: `Generated: ${new Date().toLocaleString()}` },
+    const blocks: DocxContentBlock[] = [
+      { text: `Clinical Safety Case Report for ${getProjectTitle()}`, style: 'Title' },
+      { text: `Generated: ${new Date().toLocaleString()}`, align: 'center' },
+      {
+        text: 'TEMPLATE: Review and amend this generated report before final sign-off.',
+        align: 'center',
+        highlight: 'yellow'
+      },
       { text: '' },
 
-      { text: '1. Introduction', bold: true },
-      { text: 'This report outlines the clinical safety activities and risk-management outputs.' },
+      { text: '1. Introduction', style: 'Heading1' },
+      {
+        text: 'This report outlines the clinical safety activities and risk-management outputs.',
+        style: 'Normal'
+      },
       { text: '' },
 
-      { text: '2. Purpose', bold: true },
-      { text: '- Report on clinical hazards.' },
-      { text: '- Summarise the current risk profile and any unresolved areas.' },
+      { text: '2. Purpose', style: 'Heading1' },
+      { text: 'Report on clinical hazards.', bulletLevel: 0, style: 'Normal' },
+      {
+        text: 'Summarise the current risk profile and any unresolved areas.',
+        bulletLevel: 0,
+        style: 'Normal'
+      },
       { text: '' },
 
-      { text: '3. Description of the proposed new system', bold: true }
+      { text: '3. Description of the proposed new system', style: 'Heading1' }
     ];
 
     appendMultilineText(
-      paragraphs,
+      blocks,
       projectData.description?.trim() || '',
       'Not completed yet. Add a system description in Project Details.'
     );
-    paragraphs.push({ text: '' });
+    blocks.push({ text: '' });
 
-    paragraphs.push({ text: '4. Clinical Safety Governance', bold: true });
-    paragraphs.push({
-      text: `Clinical Safety Officer: ${projectData.safetyOfficer?.trim() || 'Not completed yet.'}`
+    blocks.push({ text: '4. Clinical Safety Governance', style: 'Heading1' });
+    blocks.push({
+      text: `Clinical Safety Officer: ${projectData.safetyOfficer?.trim() || 'Not completed yet.'}`,
+      style: 'Normal'
     });
-    paragraphs.push({
+    blocks.push({
       text: `Vendor compliance review checked: ${
         projectData.compliance?.vendorComplianceReviewed ? 'Checked' : 'Not checked'
-      }`
+      }`,
+      style: 'Normal'
     });
-    paragraphs.push({ text: '' });
+    blocks.push({ text: '' });
 
-    paragraphs.push({ text: '5. Hazard Identification', bold: true });
-    paragraphs.push({
-      text: 'A hazard is any potential source of harm associated with use of the system.'
+    blocks.push({ text: '5. Hazard Identification', style: 'Heading1' });
+    blocks.push({
+      text: 'A hazard is any potential source of harm associated with use of the system.',
+      style: 'Normal'
     });
-    paragraphs.push({
-      text: 'Residual risk is the risk level remaining after planned mitigations are applied.'
+    blocks.push({
+      text: 'Residual risk is the risk level remaining after planned mitigations are applied.',
+      style: 'Normal'
     });
-    paragraphs.push({
-      text: 'NHS guidance: https://digital.nhs.uk/services/clinical-safety/documentation'
+    blocks.push({
+      text: 'NHS guidance: https://digital.nhs.uk/services/clinical-safety/documentation',
+      style: 'Normal'
     });
+    const hazardRows =
+      hazardItems.length > 0
+        ? hazardItems.map((hazard) => {
+            const highestRisk = HazardUtils.getHighestRisk(hazard);
+            const residualRisk = highestRisk.rating
+              ? `${highestRisk.score} - ${highestRisk.rating}`
+              : 'Not yet assessed';
+            return [
+              { text: hazard.description || `Hazard ${hazard.id}` },
+              {
+                text: residualRisk,
+                highlight: getRiskHighlight(highestRisk.rating)
+              }
+            ];
+          })
+        : [
+            [
+              { text: 'Not completed yet. No hazards are currently recorded in this case.' },
+              { text: 'Not yet assessed' }
+            ]
+          ];
 
-    if (!hazardItems.length) {
-      paragraphs.push({ text: 'Not completed yet. No hazards are currently recorded in this case.' });
-    } else {
-      for (const hazard of hazardItems) {
-        paragraphs.push({
-          text: `- ${hazard.description || `Hazard ${hazard.id}`} | Residual risk: ${HazardUtils.getHighestRisk(hazard).rating || 'Not yet assessed'}`
-        });
-      }
-    }
-    paragraphs.push({ text: '' });
+    blocks.push({
+      type: 'table',
+      headers: [
+        { text: 'Hazard', bold: true },
+        { text: 'Level of residual risk after mitigations', bold: true }
+      ],
+      rows: hazardRows,
+      columnWidths: [4680, 5175]
+    });
+    blocks.push({ text: '' });
 
-    paragraphs.push({ text: '6. Risk Assessment and Mitigations', bold: true });
+    blocks.push({ text: '6. Risk Assessment & Mitigations', style: 'Heading1' });
     appendMultilineText(
-      paragraphs,
+      blocks,
       section6Text,
       'Not completed yet. Add Section 6 content in Case Report Inputs.'
     );
-    paragraphs.push({ text: '' });
+    blocks.push({ text: '' });
 
     if (includeSection7) {
-      paragraphs.push({ text: '7. Alternative options', bold: true });
-      appendMultilineText(paragraphs, section7Text);
-      paragraphs.push({ text: '' });
+      blocks.push({ text: '7. Alternative options', style: 'Heading1' });
+      appendMultilineText(blocks, section7Text);
+      blocks.push({ text: '' });
     }
 
-    paragraphs.push({ text: `${conclusionNumber}. Clinical Safety Case Report Conclusion`, bold: true });
-    paragraphs.push({
+    blocks.push({ text: `${conclusionNumber}. Clinical Safety Case Report Conclusion`, style: 'Heading1' });
+    blocks.push({
       text:
         'Recommended to be implemented by the Clinical Safety Officer (subject to mitigations being enacted): ' +
-        (section8Recommendation ? 'Yes' : 'No / not confirmed')
+        (section8Recommendation ? 'Yes' : 'No / not confirmed'),
+      bold: true
     });
     appendMultilineText(
-      paragraphs,
+      blocks,
       section8NarrativeText,
       !section8Recommendation
         ? 'Not completed yet. Add Section 8 content in Case Report Inputs.'
         : undefined
     );
 
-    return paragraphs;
+    return blocks;
   }
 
   /**
