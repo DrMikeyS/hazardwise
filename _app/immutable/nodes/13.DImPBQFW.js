@@ -1,1 +1,0 @@
-import{f as o,a as s}from"../chunks/EuKFVhsR.js";import"../chunks/CjrjPegm.js";var t=o('<main class="container py-4"><h1 class="mb-4">Manage impacts</h1> <p class="text-muted">This section is under construction. Check back soon!</p></main>');function m(a){var n=t();s(a,n)}export{m as component};
