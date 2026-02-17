@@ -114,7 +114,12 @@
         </div>
         <div class="mb-3"></div>
         <label class="form-label">Likelihood</label>
-        <p>How likely is it that this impact will occur <strong>due to this hazard</strong> and <strong>with the planned mitigations</strong> in place?</p>
+        <p>
+          Use the most likely plausible worst-case outcome when judging likelihood.
+          How likely is that outcome to occur <strong>due to this hazard</strong> and
+          <strong>with the planned mitigations</strong> in place?
+          Example: if the plausible worst case is delayed treatment, rate how often that delayed-treatment outcome could happen.
+        </p>
         <table class="table table-bordered align-middle">
           <tbody>
             {#each likelihoodOptions as option}

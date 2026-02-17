@@ -384,6 +384,10 @@ function removeImpact(iid: string) {
       <small class="text-muted">▼</small>
     </summary>
     <div class="card-body">
+      <p class="text-muted mb-3">
+        When assessing severity and likelihood, use the most likely plausible worst-case outcome with planned mitigations in place.
+        Example: if an error could plausibly delay treatment, assess the delayed-treatment harm, not only a minor correction.
+      </p>
       <!-- Existing Impacts-->
        {#if hazardObj?.hazardImpacts?.length}
   <table class="table table-striped mb-3">

@@ -237,19 +237,19 @@
     },
     {
       "id": "M02",
-      "description": "Appropraite microphones to be used. Clinical rooms are suitably soundproofed. Advising users about the impact of background noise."
+      "description": "Use appropriate microphones. Ensure clinical rooms are suitably soundproofed. Advise users about the impact of background noise."
     },
     {
       "id": "M03",
-      "description": "All users are trained to review closely every output before adding to medical record. Users must be informed they hold ultimate medicolegal responsibility for the entry into the medical record."
+      "description": "Train each user to review every output closely before adding it to the medical record. Inform users that they hold ultimate medicolegal responsibility for entries in the medical record."
     },
     {
       "id": "M04",
-      "description": "All users are made aware of this risk and aim to speak clearly and if not, be aware outputs may suffer."
+      "description": "Make all users aware of this risk and require clear speech, noting that outputs may suffer if speech is unclear."
     },
     {
       "id": "M05",
-      "description": "All users are made aware of this risk and to be vigilant. All users are trained to review closely every output before adding to medical record."
+      "description": "Make all users aware of this risk and require vigilance. Train each user to review every output closely before adding it to the medical record."
     },
     {
       "id": "M06",
@@ -261,19 +261,19 @@
     },
     {
       "id": "M08",
-      "description": "All users are made aware of the risk of failing to transfer data correctly and to be vigilant."
+      "description": "Make all users aware of the risk of failing to transfer data correctly and require vigilance."
     },
     {
       "id": "M09",
-      "description": "Ensure posters and website information present. Consider adding to appointment reminders."
+      "description": "Ensure posters and website information are present. Add this information to appointment reminders."
     },
     {
       "id": "M10",
-      "description": "All users to be trained in neccessity to consent every time."
+      "description": "Train all users on the necessity of obtaining consent every time."
     },
     {
       "id": "M11",
-      "description": "Any user who is adding custom prompts to be trained in how to ensure they outputs are within the scope of product purpose and non-medical device status."
+      "description": "Train any user adding custom prompts to ensure outputs remain within the scope of product purpose and non-medical device status."
     }
   ],
   "impacts": [

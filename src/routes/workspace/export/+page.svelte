@@ -8,9 +8,14 @@ import { base } from "$app/paths";
 <main class="container py-4">
   <h1 class="mb-4">Export tools</h1>
   <ExportData /> 
-  <a class="btn btn-outline-secondary mt-3" href="{base}/printableExport" target="_blank">
-    Printable Export
-  </a>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-secondary" href="{base}/printableExport" target="_blank">
+      Printable Hazard Log
+    </a>
+    <a class="btn btn-outline-secondary" href="{base}/printableMitigations" target="_blank">
+      Printable Mitigation List
+    </a>
+  </div>
   <!-- You can add search, filters, tables, and forms here -->
 </main>
  

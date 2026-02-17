@@ -202,7 +202,12 @@ $: console.log('Risk assessment:', riskResult, rawScore);
   </div>
 
   <h5 class="mt-4">Severity</h5>
-  <p>How badly could someone (or some people) be hurt if this impact occured?</p>
+  <p>
+    Choose severity based on the most likely plausible worst-case outcome if this impact occurs,
+    assuming planned mitigations are in place.
+    Example: if a documentation error could plausibly delay treatment, rate the harm from delayed treatment,
+    not just the admin correction effort.
+  </p>
 <table class="table table-bordered align-middle">
   <tbody>
     {#each severityOptions as option}
@@ -224,8 +229,10 @@ $: console.log('Risk assessment:', riskResult, rawScore);
 </table>
 
   <h5 class="mt-4">Likelihood</h5>
-  <p>How likely is it that this impact will occur <strong>due to this hazard</strong> and 
-    <strong>with the planned mitigations</strong> in place?</p>
+  <p>
+    How likely is that same most likely plausible worst-case outcome to occur
+    <strong>due to this hazard</strong> and <strong>with the planned mitigations</strong> in place?
+  </p>
   
   <table class="table table-bordered align-middle">
     <tbody>
