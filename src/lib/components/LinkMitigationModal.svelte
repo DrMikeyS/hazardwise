@@ -28,14 +28,16 @@
 
         <div class="modal-header">
           <h5 class="modal-title">Link Existing Mitigation</h5>
-          <button type="button" class="btn-close" on:click={handleClose}></button>
+          <button type="button" class="btn-close" aria-label="Close" on:click={handleClose}></button>
         </div>
 
         <div class="modal-body">
+          <label for="searchMitigations" class="form-label">Search mitigations</label>
+          <div class="form-text mb-2">Filter mitigations by description.</div>
           <input
+            id="searchMitigations"
             type="text"
             class="form-control mb-3"
-            placeholder="Search mitigations..."
             bind:value={search}
           />
 

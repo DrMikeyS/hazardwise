@@ -125,12 +125,12 @@
 
   <div class="mb-3">
     <label for="causeDescription" class="form-label">Cause Description</label>
+    <div class="form-text mb-2">Describe a factor or condition that could lead to this hazard.</div>
     <textarea
       id="causeDescription"
       class="form-control"
       rows="3"
       bind:value={description}
-      placeholder="Describe a factor that could lead to this hazard"
     ></textarea>
     <div class="form-text">
       A cause is a factor or condition that could contribute to the hazard occurring. e.g. "A drink is spilled leaving a puddle of liquid that goes unnoticed."

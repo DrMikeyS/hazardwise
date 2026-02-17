@@ -24,13 +24,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Link Existing Impact</h5>
-          <button type="button" class="btn-close" on:click={handleClose}></button>
+          <button type="button" class="btn-close" aria-label="Close" on:click={handleClose}></button>
         </div>
         <div class="modal-body">
+          <label for="searchImpacts" class="form-label">Search impacts</label>
+          <div class="form-text mb-2">Filter impacts by description, likelihood, or severity.</div>
           <input
+            id="searchImpacts"
             type="text"
             class="form-control mb-3"
-            placeholder="Search impacts..."
             bind:value={search}
           />
           {#if impacts.length}

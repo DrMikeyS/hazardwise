@@ -22,13 +22,13 @@ import { base } from '$app/paths';
     <label for="projectTitle" class="form-label">
       Project Title <span class="text-danger">*</span>
     </label>
+    <div class="form-text mb-2">Enter a clear title for this clinical safety case.</div>
     <input
       id="projectTitle"
       type="text"
       bind:value={title}
       required
       class="form-control w-100"
-      placeholder="Enter project title"
     />
   </div>
 
@@ -37,4 +37,3 @@ import { base } from '$app/paths';
   </button>
 </form>
 </main>
-

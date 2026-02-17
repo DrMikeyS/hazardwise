@@ -9,6 +9,9 @@
   $: {
     const p = $project;
     const m = $mitigations;
+    const caseReportSections = p.caseReportSections ?? {};
+    const alternativeOptionsText =
+      caseReportSections.alternatives ?? p.alternatives ?? '';
     console.log('mitigations', m);
     const hazardCount = p.hazards?.length ?? 0;
 
@@ -18,7 +21,7 @@
       hazardLogRiskAssessment: String(hazardCount)+" Hazards Identified",
       mitigationsInPlace: String(m.length)+" Mitigations Identified",
       vendorComplianceReview: Boolean(p.compliance?.vendorComplianceReviewed),
-      alternativeOptionsAnalysis: Boolean(p.alternatives?.trim())
+      alternativeOptionsAnalysis: Boolean(alternativeOptionsText.trim())
     };
   }
 
@@ -63,7 +66,7 @@
       title: 'Consideration of Risks/Benefits of Alternative Options',
       description:
         'Evaluation of potential alternatives, including risk-benefit analysis to justify selected solutions.',
-      link: base + '/workspace/project'
+      link: base + '/workspace/case-report'
     }
   ];
 </script>

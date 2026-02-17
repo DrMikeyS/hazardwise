@@ -95,12 +95,14 @@
     <label for="mitigationDescription" class="form-label">
       Mitigation Description
     </label>
+    <div class="form-text mb-2">
+      Describe the control or action that reduces the likelihood or impact of harm.
+    </div>
     <textarea
       id="mitigationDescription"
       class="form-control"
       rows="3"
       bind:value={description}
-      placeholder="e.g. Add human review step"
     ></textarea>
     <div class="form-text">
       A mitigation is an action or control that reduces the likelihood or impact of a hazard or cause. e.g. "Staff are advised not to carry uncovered drinks to prevent spills.".

@@ -23,13 +23,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Link Existing Cause</h5>
-          <button type="button" class="btn-close" on:click={handleClose}></button>
+          <button type="button" class="btn-close" aria-label="Close" on:click={handleClose}></button>
         </div>
         <div class="modal-body">
+          <label for="searchCauses" class="form-label">Search causes</label>
+          <div class="form-text mb-2">Filter causes by description.</div>
           <input
+            id="searchCauses"
             type="text"
             class="form-control mb-3"
-            placeholder="Search causes..."
             bind:value={search}
           />
           {#if causes.length}

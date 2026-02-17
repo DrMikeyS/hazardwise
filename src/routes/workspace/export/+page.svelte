@@ -15,6 +15,9 @@ import { base } from "$app/paths";
     <a class="btn btn-outline-secondary" href="{base}/printableMitigations" target="_blank">
       Printable Mitigation List
     </a>
+    <a class="btn btn-outline-primary" href="{base}/printableClinicalSafetyCase" target="_blank">
+      Clinical Safety Case Report (Printable / PDF)
+    </a>
   </div>
   <!-- You can add search, filters, tables, and forms here -->
 </main>

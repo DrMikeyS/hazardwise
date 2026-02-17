@@ -97,6 +97,14 @@
         </li>
         <li class="nav-item">
           <a
+            class="nav-link { $page.url.pathname === `${base}/workspace/case-report` ? 'active' : '' }"
+            href="{base}/workspace/case-report"
+          >
+            📝 <span class="label ms-2">Case Report Inputs</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
             class="nav-link { $page.url.pathname === `${base}/workspace/compliance` ? 'active' : '' }"
             href="{base}/workspace/compliance"
           >

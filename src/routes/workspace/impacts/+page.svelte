@@ -200,12 +200,14 @@
 			<h5 class="card-title">Add New Impact</h5>
 			<div class="mb-3">
 				<label for="impactDescription" class="form-label">Description</label>
+				<div class="form-text mb-2">
+					Describe the potential harm outcome linked to hazards in this case.
+				</div>
 				<textarea
 					id="impactDescription"
 					class="form-control"
 					rows="2"
 					bind:value={newImpactDescription}
-					placeholder="Describe the potential impact"
 				></textarea>
 			</div>
 			<div class="mb-3">
@@ -222,10 +224,14 @@
 	</div>
 
 	<div class="mb-3">
+		<label for="impactSearch" class="form-label">Search impacts</label>
+		<div class="form-text mb-2">
+			Filter by ID, description, severity, linked hazard ID, or risk label.
+		</div>
 		<input
+			id="impactSearch"
 			type="text"
 			class="form-control"
-			placeholder="Search by ID, description, severity, hazard ID, or risk label..."
 			bind:value={searchText}
 		/>
 	</div>

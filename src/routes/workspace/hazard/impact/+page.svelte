@@ -189,12 +189,14 @@ $: console.log('Risk assessment:', riskResult, rawScore);
 
   <div class="mb-3">
     <label for="impactDescription" class="form-label">Impact Description</label>
+    <div class="form-text mb-2">
+      Describe the likely effect on patients, staff, or the service if the hazard occurs.
+    </div>
     <textarea
       id="impactDescription"
       class="form-control"
       rows="3"
       bind:value={description}
-      placeholder="e.g. Incorrect clinical advice leads to unsafe prescription"
     ></textarea>
     <div class="form-text">
       Describe the impact of this hazard on patients, staff or the service. e.g. "Person slips and suffers an injury.".

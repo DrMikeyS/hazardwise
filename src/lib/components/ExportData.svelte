@@ -7,6 +7,7 @@
   import { HazardUtils } from '$lib/utils/hazard';
   import { assessHazardImpact } from '$lib/utils/dcbRisk';
   import { downloadDocx, type DocxParagraph } from '$lib/utils/docxExport';
+  import { base } from '$app/paths';
 
   type HazardImpact = {
     impactID: string;
@@ -219,6 +220,10 @@
       buildMitigationListParagraphs()
     );
   }
+
+  function openPrintableClinicalSafetyCase() {
+    window.open(`${base}/printableClinicalSafetyCase`, '_blank', 'noopener,noreferrer');
+  }
 </script>
 
 <div class="my-4">
@@ -231,6 +236,9 @@
     </button>
     <button class="btn btn-outline-secondary" on:click={exportMitigationListDocx}>
       Export Mitigation List (.docx)
+    </button>
+    <button class="btn btn-outline-primary" on:click={openPrintableClinicalSafetyCase}>
+      Clinical Safety Case Report (Printable / PDF)
     </button>
   </div>
 </div>
