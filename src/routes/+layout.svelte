@@ -1,25 +1,89 @@
-<!-- src/routes/+layout.svelte -->
 <script lang="ts">
   import 'bootstrap/dist/css/bootstrap.min.css';
   import '../app.css';
   import { page } from '$app/stores';
   import { base } from '$app/paths';
   import { startNewProject } from '$lib/navigation.js';
-  let collapsed = false;
-  function toggleSidebar() {
-    collapsed = !collapsed;
+
+  let mobileMenuOpen = false;
+
+  type MenuItem = {
+    icon: string;
+    label: string;
+    href: string;
+    exact?: boolean;
+    match?: string[];
+  };
+
+  const menuSections: { heading: string; items: MenuItem[] }[] = [
+    {
+      heading: 'Workspace',
+      items: [
+        { icon: '🏠', label: 'Overview', href: '/workspace', exact: true },
+        { icon: '📊', label: 'Project Details', href: '/workspace/project' }
+      ]
+    },
+    {
+      heading: 'Risk Register',
+      items: [
+        {
+          icon: '⚠️',
+          label: 'Hazards',
+          href: '/workspace/hazards',
+          match: ['/workspace/hazards', '/workspace/hazard']
+        },
+        { icon: '⚙️', label: 'Mitigations', href: '/workspace/mitigations' },
+        { icon: '⚡️', label: 'Impacts', href: '/workspace/impacts' }
+      ]
+    },
+    {
+      heading: 'Documentation',
+      items: [
+        { icon: '📝', label: 'Case Report Inputs', href: '/workspace/case-report' },
+        { icon: '🛡️', label: 'Compliance', href: '/workspace/compliance' },
+        { icon: '📤', label: 'Export Tools', href: '/workspace/export' }
+      ]
+    }
+  ];
+
+  function toggleMobileMenu() {
+    mobileMenuOpen = !mobileMenuOpen;
+  }
+
+  function closeMobileMenu() {
+    mobileMenuOpen = false;
+  }
+
+  function isItemActive(item: MenuItem) {
+    const path = $page.url.pathname;
+
+    if (item.exact) {
+      return path === `${base}${item.href}`;
+    }
+
+    if (item.match?.length) {
+      return item.match.some((prefix) => {
+        const full = `${base}${prefix}`;
+        return path === full || path.startsWith(`${full}/`);
+      });
+    }
+
+    const fullHref = `${base}${item.href}`;
+    return path === fullHref || path.startsWith(`${fullHref}/`);
   }
 
   function handleStartNewProject() {
     if (confirm('Really start new project? This will clear current data.')) {
+      closeMobileMenu();
       startNewProject();
-    } else {
-      // abort
-    }    
+    }
   }
 
-  // only show sidebar when path starts with /workspace
   $: showSidebar = $page.url.pathname.startsWith(`${base}/workspace`);
+
+  $: if (!showSidebar) {
+    mobileMenuOpen = false;
+  }
 </script>
 
 <svelte:head>
@@ -27,118 +91,202 @@
 </svelte:head>
 
 <style>
-  .sidebar { width: 250px; transition: width .2s ease; }
-  .sidebar.collapsed { width: 70px; }
-  .sidebar .label { display: inline-block; transition: opacity .2s ease, width .2s ease; white-space: nowrap; }
-  .sidebar.collapsed .label { opacity: 0; width: 0; overflow: hidden; }
-  main { transition: margin-left .2s ease; }
-  .main-expanded { margin-left: 250px; }
-  .main-collapsed { margin-left: 70px; }
-  .logo-text { font-family: "Jost", sans-serif; color: #016FB8; }
+  .workspace-shell {
+    min-height: 100vh;
+  }
+
+  .workspace-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 280px;
+    height: 100vh;
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    overflow-y: auto;
+  }
+
+  .workspace-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .logo-text {
+    font-family: 'Jost', sans-serif;
+    color: #016fb8;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .menu-heading {
+    font-size: 0.73rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6c757d;
+    padding: 0 1rem;
+    margin: 1rem 0 0.45rem;
+  }
+
+  .nav-item {
+    padding: 0 0.6rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border-radius: 0.55rem;
+    color: #2f343a;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .nav-link:hover {
+    background: #e9ecef;
+  }
+
+  .nav-link.active {
+    background: #016fb8;
+    color: #fff;
+  }
+
+  .menu-icon {
+    width: 1.2rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .workspace-main {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .mobile-overlay {
+    border: 0;
+    padding: 0;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1030;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .mobile-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (min-width: 992px) {
+    .workspace-sidebar {
+      transform: translateX(0);
+    }
+
+    .workspace-main.with-sidebar {
+      margin-left: 280px;
+      padding: 1.4rem;
+    }
+
+    .mobile-topbar,
+    .mobile-overlay {
+      display: none;
+    }
+  }
 </style>
 
-<div class="d-flex">
+<div class="workspace-shell d-flex">
   {#if showSidebar}
-    <!-- Sidebar -->
-    <div class="bg-light sidebar border-end vh-100 position-fixed {collapsed ? 'collapsed' : ''}">
-      <div
-        class="d-flex align-items-center gap-2 mb-4 p-3 logo-wrapper"
-        on:click={toggleSidebar}
-        style="cursor: pointer;"
-      >
-        <img
-          src="{base}/hazardwise_icon.svg"
-          alt="HazardWise Logo"
-          style="width:40px; height:40px;"
-        />
-        <div class="logo-text fs-4 fw-bold label">HazardWise</div>
+    <aside
+      id="workspace-menu"
+      class="workspace-sidebar {mobileMenuOpen ? 'open' : ''}"
+      aria-label="Main workspace menu"
+    >
+      <div class="sidebar-header">
+        <div class="logo-wrap">
+          <img src={base + '/hazardwise_icon.svg'} alt="HazardWise Logo" style="width:40px; height:40px;" />
+          <span class="logo-text">HazardWise</span>
+        </div>
       </div>
 
-      <ul class="nav nav-pills flex-column mt-3">
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace` ? 'active' : '' }"
-            href="{base}/workspace"
-          >
-            🏠 <span class="label ms-2">Overview</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace/hazards` ? 'active' : '' }"
-            href="{base}/workspace/hazards"
-          >
-            ⚠️ <span class="label ms-2">Hazards</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace/mitigations` ? 'active' : '' }"
-            href="{base}/workspace/mitigations"
-          >
-            ⚙️ <span class="label ms-2">Manage Mitigations</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace/impacts` ? 'active' : '' }"
-            href="{base}/workspace/impacts"
-          >
-            ⚡️ <span class="label ms-2">Manage Impacts</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace/project` ? 'active' : '' }"
-            href="{base}/workspace/project"
-          >
-            📊 <span class="label ms-2">Project Details</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace/case-report` ? 'active' : '' }"
-            href="{base}/workspace/case-report"
-          >
-            📝 <span class="label ms-2">Case Report Inputs</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace/compliance` ? 'active' : '' }"
-            href="{base}/workspace/compliance"
-          >
-            🛡️ <span class="label ms-2">Compliance</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link { $page.url.pathname === `${base}/workspace/export` ? 'active' : '' }"
-            href="{base}/workspace/export"
-          >
-            📤 <span class="label ms-2">Export Tools</span>
-          </a>
-        </li>
-      <li class="nav-item">
-      <button
-        type="button"
-        class="nav-link btn btn-link text-start w-100"
-        on:click={handleStartNewProject}
-      >
-        ✨ <span class="label ms-2">Start New Project</span>
-      </button>
-    </li>
-      </ul>
-    </div>
+      {#each menuSections as section}
+        <div class="menu-heading">{section.heading}</div>
+        <ul class="nav flex-column">
+          {#each section.items as item}
+            <li class="nav-item">
+              <a
+                class="nav-link {isItemActive(item) ? 'active' : ''}"
+                href={base + item.href}
+                on:click={closeMobileMenu}
+              >
+                <span class="menu-icon">{item.icon}</span>
+                <span>{item.label}</span>
+              </a>
+            </li>
+          {/each}
+        </ul>
+      {/each}
+
+      <div class="mt-auto p-3 border-top">
+        <button
+          type="button"
+          class="btn btn-outline-primary w-100"
+          on:click={handleStartNewProject}
+        >
+          ✨ Start New Project
+        </button>
+      </div>
+    </aside>
+
+    <button
+      type="button"
+      class="mobile-overlay {mobileMenuOpen ? 'show' : ''}"
+      on:click={closeMobileMenu}
+      aria-label="Close navigation menu"
+    ></button>
   {/if}
 
-  <!-- Main content: shift only when sidebar is shown -->
-  <main
-    class="py-4 px-3 flex-grow-1
-      {showSidebar
-         ? (collapsed ? 'main-collapsed' : 'main-expanded')
-         : ''}"
-  >
+  <main class="workspace-main {showSidebar ? 'with-sidebar' : ''}">
+    {#if showSidebar}
+      <div class="mobile-topbar d-lg-none">
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          on:click={toggleMobileMenu}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="workspace-menu"
+        >
+          ☰ Menu
+        </button>
+        <span class="fw-semibold">Workspace</span>
+      </div>
+    {/if}
+
     <slot />
   </main>
 </div>

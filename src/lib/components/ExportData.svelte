@@ -39,6 +39,26 @@
     severity?: string;
   };
 
+  type CaseReportSections = {
+    riskAssessmentAndMitigations?: string;
+    alternatives?: string;
+    implementationRecommendedByCSO?: boolean;
+    conclusionNarrative?: string;
+    conclusion?: string;
+  };
+
+  type ProjectData = {
+    title?: string;
+    description?: string;
+    safetyOfficer?: string;
+    hazards?: Hazard[];
+    compliance?: {
+      vendorComplianceReviewed?: boolean;
+    };
+    caseReportSections?: CaseReportSections;
+    alternatives?: string;
+  };
+
   function sanitizeFileName(value: string): string {
     const cleaned = value
       .toLowerCase()
@@ -59,6 +79,32 @@
 
   function mapById<T extends { id: string }>(items: T[]): Map<string, T> {
     return new Map(items.map((item) => [item.id, item]));
+  }
+
+  function getCaseReportSectionValue(projectData: ProjectData, key: keyof CaseReportSections): string {
+    const caseReportSections = projectData.caseReportSections || {};
+    const value = caseReportSections[key];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+    return '';
+  }
+
+  function appendMultilineText(
+    paragraphs: DocxParagraph[],
+    value: string,
+    fallbackText?: string
+  ): void {
+    if (value.trim()) {
+      for (const line of value.split(/\r?\n/)) {
+        paragraphs.push({ text: line });
+      }
+      return;
+    }
+
+    if (fallbackText) {
+      paragraphs.push({ text: fallbackText });
+    }
   }
 
   function getAllMitigationIdsForHazard(hazard: Hazard, causeMap: Map<string, Cause>): string[] {
@@ -183,6 +229,110 @@
     return paragraphs;
   }
 
+  function buildClinicalSafetyCaseReportParagraphs(): DocxParagraph[] {
+    const projectData = get(project) as ProjectData;
+    const hazardItems = (projectData.hazards || []) as Hazard[];
+    const section6Text = getCaseReportSectionValue(projectData, 'riskAssessmentAndMitigations');
+    const section7Text =
+      getCaseReportSectionValue(projectData, 'alternatives') ||
+      (projectData.alternatives?.trim() || '');
+    const includeSection7 = Boolean(section7Text.trim());
+    const conclusionNumber = includeSection7 ? '8' : '7';
+    const section8Recommendation = Boolean(
+      projectData.caseReportSections?.implementationRecommendedByCSO
+    );
+    const section8NarrativeText =
+      getCaseReportSectionValue(projectData, 'conclusionNarrative') ||
+      getCaseReportSectionValue(projectData, 'conclusion');
+
+    const paragraphs: DocxParagraph[] = [
+      { text: `Clinical Safety Case Report - ${getProjectTitle()}`, bold: true },
+      { text: `Generated: ${new Date().toLocaleString()}` },
+      { text: '' },
+
+      { text: '1. Introduction', bold: true },
+      { text: 'This report outlines the clinical safety activities and risk-management outputs.' },
+      { text: '' },
+
+      { text: '2. Purpose', bold: true },
+      { text: '- Report on clinical hazards.' },
+      { text: '- Summarise the current risk profile and any unresolved areas.' },
+      { text: '' },
+
+      { text: '3. Description of the proposed new system', bold: true }
+    ];
+
+    appendMultilineText(
+      paragraphs,
+      projectData.description?.trim() || '',
+      'Not completed yet. Add a system description in Project Details.'
+    );
+    paragraphs.push({ text: '' });
+
+    paragraphs.push({ text: '4. Clinical Safety Governance', bold: true });
+    paragraphs.push({
+      text: `Clinical Safety Officer: ${projectData.safetyOfficer?.trim() || 'Not completed yet.'}`
+    });
+    paragraphs.push({
+      text: `Vendor compliance review checked: ${
+        projectData.compliance?.vendorComplianceReviewed ? 'Checked' : 'Not checked'
+      }`
+    });
+    paragraphs.push({ text: '' });
+
+    paragraphs.push({ text: '5. Hazard Identification', bold: true });
+    paragraphs.push({
+      text: 'A hazard is any potential source of harm associated with use of the system.'
+    });
+    paragraphs.push({
+      text: 'Residual risk is the risk level remaining after planned mitigations are applied.'
+    });
+    paragraphs.push({
+      text: 'NHS guidance: https://digital.nhs.uk/services/clinical-safety/documentation'
+    });
+
+    if (!hazardItems.length) {
+      paragraphs.push({ text: 'Not completed yet. No hazards are currently recorded in this case.' });
+    } else {
+      for (const hazard of hazardItems) {
+        paragraphs.push({
+          text: `- ${hazard.description || `Hazard ${hazard.id}`} | Residual risk: ${HazardUtils.getHighestRisk(hazard).rating || 'Not yet assessed'}`
+        });
+      }
+    }
+    paragraphs.push({ text: '' });
+
+    paragraphs.push({ text: '6. Risk Assessment and Mitigations', bold: true });
+    appendMultilineText(
+      paragraphs,
+      section6Text,
+      'Not completed yet. Add Section 6 content in Case Report Inputs.'
+    );
+    paragraphs.push({ text: '' });
+
+    if (includeSection7) {
+      paragraphs.push({ text: '7. Alternative options', bold: true });
+      appendMultilineText(paragraphs, section7Text);
+      paragraphs.push({ text: '' });
+    }
+
+    paragraphs.push({ text: `${conclusionNumber}. Clinical Safety Case Report Conclusion`, bold: true });
+    paragraphs.push({
+      text:
+        'Recommended to be implemented by the Clinical Safety Officer (subject to mitigations being enacted): ' +
+        (section8Recommendation ? 'Yes' : 'No / not confirmed')
+    });
+    appendMultilineText(
+      paragraphs,
+      section8NarrativeText,
+      !section8Recommendation
+        ? 'Not completed yet. Add Section 8 content in Case Report Inputs.'
+        : undefined
+    );
+
+    return paragraphs;
+  }
+
   /**
    * Gather all store data and trigger a JSON download.
    */
@@ -221,24 +371,108 @@
     );
   }
 
-  function openPrintableClinicalSafetyCase() {
-    window.open(`${base}/printableClinicalSafetyCase`, '_blank', 'noopener,noreferrer');
+  function exportClinicalSafetyCaseReportDocx() {
+    downloadDocx(
+      `${getExportPrefix()}-clinical-safety-case-report.docx`,
+      `${getProjectTitle()} Clinical Safety Case Report`,
+      buildClinicalSafetyCaseReportParagraphs()
+    );
   }
+
 </script>
 
-<div class="my-4">
-  <div class="d-flex flex-wrap gap-2 mb-3">
-    <button class="btn btn-outline-primary" on:click={exportJSON}>
-      Export Data to JSON
-    </button>
-    <button class="btn btn-outline-secondary" on:click={exportHazardLogDocx}>
-      Export Hazard Log (.docx)
-    </button>
-    <button class="btn btn-outline-secondary" on:click={exportMitigationListDocx}>
-      Export Mitigation List (.docx)
-    </button>
-    <button class="btn btn-outline-primary" on:click={openPrintableClinicalSafetyCase}>
-      Clinical Safety Case Report (Printable / PDF)
-    </button>
+<section class="mb-5">
+  <h2 class="h5 mb-3">Project Data</h2>
+  <div class="row g-3">
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <h3 class="h6 card-title">Project Data (.json)</h3>
+          <p class="small text-muted flex-grow-1 mb-3">
+            Full project snapshot for backup, audit trail, or import into another workspace.
+          </p>
+          <button class="btn btn-primary w-100" on:click={exportJSON}>
+            Download JSON
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>
+
+<section>
+  <h2 class="h5 mb-3">Reports</h2>
+  <div class="row g-3">
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <h3 class="h6 card-title">Hazard Log</h3>
+          <p class="small text-muted flex-grow-1 mb-3">
+            Full hazard summary with causes, impacts, mitigations, and risk ratings.
+          </p>
+          <div class="d-grid gap-2">
+            <a
+              class="btn btn-outline-secondary"
+              href="{base}/printableExport"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open Printable / PDF
+            </a>
+            <button class="btn btn-outline-secondary" on:click={exportHazardLogDocx}>
+              Download DOCX
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <h3 class="h6 card-title">Mitigation List</h3>
+          <p class="small text-muted flex-grow-1 mb-3">
+            Consolidated list of mitigations currently captured in the case.
+          </p>
+          <div class="d-grid gap-2">
+            <a
+              class="btn btn-outline-secondary"
+              href="{base}/printableMitigations"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open Printable / PDF
+            </a>
+            <button class="btn btn-outline-secondary" on:click={exportMitigationListDocx}>
+              Download DOCX
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card h-100 border-primary-subtle">
+        <div class="card-body d-flex flex-column">
+          <h3 class="h6 card-title">Clinical Safety Case Report</h3>
+          <p class="small text-muted flex-grow-1 mb-3">
+            Structured DCB0160-style report including governance, hazards, and manual narrative sections.
+          </p>
+          <div class="d-grid gap-2">
+            <a
+              class="btn btn-primary"
+              href="{base}/printableClinicalSafetyCase"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open Printable / PDF
+            </a>
+            <button class="btn btn-outline-primary" on:click={exportClinicalSafetyCaseReportDocx}>
+              Download DOCX
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
