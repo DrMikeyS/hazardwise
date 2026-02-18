@@ -8,11 +8,18 @@
   import { get } from 'svelte/store';
   import { goto } from '$app/navigation';
   import { base } from '$app/paths';
+  import {
+    MITIGATION_IMPLEMENTATION_CLASS,
+    MITIGATION_IMPLEMENTATION_HELP_TEXT,
+    MITIGATION_IMPLEMENTATION_LABELS,
+    normalizeMitigationImplementationClass
+  } from '$lib/utils/mitigation.js';
 
   let hazardID: string | null = null;
   let causeID: string | null = null;
   let mitigationID: string | null = null;
   let description = '';
+  let implementationClass: string = MITIGATION_IMPLEMENTATION_CLASS.ORGANISATION;
 
   onMount(() => {
     hazardID = page.url.searchParams.get('hazardID');
@@ -28,6 +35,7 @@
       const existing = get(mitigations).find(m => m.id === mitigationID);
       if (existing) {
         description = existing.description;
+        implementationClass = normalizeMitigationImplementationClass(existing.implementationClass);
       }
     }
   });
@@ -42,13 +50,13 @@
     mitigations.update(list => {
       if (mitigationID) {
         return list.map(m =>
-          m.id === mitigationID ? { ...m, description } : m
+          m.id === mitigationID ? { ...m, description, implementationClass } : m
         );
       } else {
         const nextIndex = list.length + 1;
         const newId = `M${String(nextIndex).padStart(2, '0')}`;
         mitigationID = newId;
-        return [...list, { id: newId, description }];
+        return [...list, { id: newId, description, implementationClass }];
       }
     });
 
@@ -108,6 +116,47 @@
       A mitigation is an action or control that reduces the likelihood or impact of a hazard or cause. e.g. "Staff are advised not to carry uncovered drinks to prevent spills.".
     </div>
   </div>
+
+  <fieldset class="mb-4">
+    <legend class="col-form-label pt-0">Who implements this mitigation?</legend>
+    <div class="form-text mb-2">
+      Choose who is responsible for putting this mitigation in place.
+    </div>
+
+    <div class="form-check mb-2">
+      <input
+        id="implementationClassOrganisation"
+        class="form-check-input"
+        type="radio"
+        name="implementationClass"
+        value={MITIGATION_IMPLEMENTATION_CLASS.ORGANISATION}
+        bind:group={implementationClass}
+      />
+      <label class="form-check-label" for="implementationClassOrganisation">
+        {MITIGATION_IMPLEMENTATION_LABELS[MITIGATION_IMPLEMENTATION_CLASS.ORGANISATION]}
+      </label>
+      <div class="form-text">
+        {MITIGATION_IMPLEMENTATION_HELP_TEXT[MITIGATION_IMPLEMENTATION_CLASS.ORGANISATION]}
+      </div>
+    </div>
+
+    <div class="form-check">
+      <input
+        id="implementationClassManufacturer"
+        class="form-check-input"
+        type="radio"
+        name="implementationClass"
+        value={MITIGATION_IMPLEMENTATION_CLASS.MANUFACTURER}
+        bind:group={implementationClass}
+      />
+      <label class="form-check-label" for="implementationClassManufacturer">
+        {MITIGATION_IMPLEMENTATION_LABELS[MITIGATION_IMPLEMENTATION_CLASS.MANUFACTURER]}
+      </label>
+      <div class="form-text">
+        {MITIGATION_IMPLEMENTATION_HELP_TEXT[MITIGATION_IMPLEMENTATION_CLASS.MANUFACTURER]}
+      </div>
+    </div>
+  </fieldset>
 
   <button class="btn btn-success" on:click={handleSave}>
     {mitigationID ? 'Save Changes' : 'Save Mitigation'}

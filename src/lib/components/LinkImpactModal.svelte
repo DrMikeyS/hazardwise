@@ -2,7 +2,12 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   export let show = false;
-  export let impacts = [];
+  export let impacts: Array<{
+    id: string;
+    description?: string;
+    likelihood?: string;
+    severity?: string;
+  }> = [];
   export let search = '';
   const dispatch = createEventDispatcher();
 

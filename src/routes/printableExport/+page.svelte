@@ -5,6 +5,7 @@
   import { mitigations } from '$lib/stores/mitigations.js';
   import { HazardUtils } from '$lib/utils/hazard';
   import { assessHazardImpact } from '$lib/utils/dcbRisk';
+  import { groupMitigationsByImplementationClass } from '$lib/utils/mitigation.js';
 
 const severityBadgeMap = {
   Catastrophic: 'bg-danger',
@@ -58,6 +59,10 @@ const likelihoodBadgeMap = {
    ;[...hazardMits, ...causeMits].forEach(m => map.set(m.id, m));
    return Array.from(map.values());
  }
+
+  function getGroupedMitigations(h) {
+    return groupMitigationsByImplementationClass(getAllMitigations(h));
+  }
 </script>
 <svelte:head>
   <title>Hazard Summary Report for {$project.title}</title>
@@ -143,11 +148,16 @@ const likelihoodBadgeMap = {
         <!-- Hazard Mitigations -->
         <h5>All Related Mitigations</h5>
 {#if getAllMitigations(h).length}
-  <ul>
-    {#each getAllMitigations(h) as mit}
-      <li>{mit.description}</li>
-    {/each}
-  </ul>
+  {#each getGroupedMitigations(h) as group}
+    {#if group.items.length}
+      <h6 class="mb-1 mt-3">{group.label}</h6>
+      <ul>
+        {#each group.items as mit}
+          <li>{mit.description}</li>
+        {/each}
+      </ul>
+    {/if}
+  {/each}
 {:else}
   <p class="text-muted">None</p>
 {/if}

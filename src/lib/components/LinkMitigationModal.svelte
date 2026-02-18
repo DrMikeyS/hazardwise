@@ -1,6 +1,7 @@
 <!-- lib/components/LinkMitigationModal.svelte -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import { getMitigationImplementationLabel } from '$lib/utils/mitigation.js';
 
   // Controls
   export let show = false;
@@ -45,7 +46,12 @@
             <ul class="list-group">
               {#each mitigations as m}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <div>{m.description}</div>
+                  <div>
+                    <div>{m.description}</div>
+                    <div class="text-muted small">
+                      {getMitigationImplementationLabel(m.implementationClass)}
+                    </div>
+                  </div>
                   <button class="btn btn-sm btn-outline-primary" on:click={() => handleLink(m.id)}>
                     Link
                   </button>

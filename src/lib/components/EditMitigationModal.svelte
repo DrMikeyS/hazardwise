@@ -3,25 +3,34 @@
   import { onMount, createEventDispatcher } from 'svelte';
   import { mitigations } from '$lib/stores/mitigations.js';
   import { get } from 'svelte/store';
+  import {
+    MITIGATION_IMPLEMENTATION_CLASS,
+    MITIGATION_IMPLEMENTATION_LABELS,
+    normalizeMitigationImplementationClass
+  } from '$lib/utils/mitigation.js';
 
   export let mitigationID: string;
   const dispatch = createEventDispatcher();
 
   let description = '';
+  let implementationClass: string = MITIGATION_IMPLEMENTATION_CLASS.ORGANISATION;
 
   onMount(() => {
     const m = get(mitigations).find(item => item.id === mitigationID);
-    if (m) description = m.description;
+    if (m) {
+      description = m.description;
+      implementationClass = normalizeMitigationImplementationClass(m.implementationClass);
+    }
     console.log(`Editing mitigation: ${mitigationID}`, m);
   });
 
   function save() {
     mitigations.update(list =>
       list.map(item =>
-        item.id === mitigationID ? { ...item, description } : item
+        item.id === mitigationID ? { ...item, description, implementationClass } : item
       )
     );
-    dispatch('save', { mitigationID, description });
+    dispatch('save', { mitigationID, description, implementationClass });
   }
 
   function cancel() {
@@ -50,6 +59,22 @@
             rows="3"
             bind:value={description}
           ></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="mitigationImplementationClass" class="form-label">Implementation Class</label>
+          <select
+            id="mitigationImplementationClass"
+            class="form-select"
+            bind:value={implementationClass}
+          >
+            <option value={MITIGATION_IMPLEMENTATION_CLASS.ORGANISATION}>
+              {MITIGATION_IMPLEMENTATION_LABELS[MITIGATION_IMPLEMENTATION_CLASS.ORGANISATION]}
+            </option>
+            <option value={MITIGATION_IMPLEMENTATION_CLASS.MANUFACTURER}>
+              {MITIGATION_IMPLEMENTATION_LABELS[MITIGATION_IMPLEMENTATION_CLASS.MANUFACTURER]}
+            </option>
+          </select>
         </div>
       </div>
 

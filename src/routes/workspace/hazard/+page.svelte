@@ -13,6 +13,7 @@
   import { mitigations } from '$lib/stores/mitigations.js';
   import { impacts } from '$lib/stores/impacts.js';
   import { HazardUtils } from '$lib/utils/hazard.js';
+  import { getMitigationImplementationLabel } from '$lib/utils/mitigation.js';
 
   import LinkImpactModal from '$lib/components/LinkImpactModal.svelte';
   import LinkCauseModal from '$lib/components/LinkCauseModal.svelte';
@@ -313,8 +314,14 @@ function removeImpact(iid: string) {
                 <td>
                   {#if c.mitigationIds?.length}
                     {#each c.mitigationIds as mid, i}
-                      { $mitigations.find(m => m.id === mid)?.description }
-                      {i < c.mitigationIds.length - 1 ? ', ' : ''}
+                      {@const mitigation = $mitigations.find(m => m.id === mid)}
+                      {#if mitigation}
+                        {mitigation.description}
+                        <span class="text-muted small">
+                          ({getMitigationImplementationLabel(mitigation.implementationClass)})
+                        </span>
+                        {i < c.mitigationIds.length - 1 ? ', ' : ''}
+                      {/if}
                     {/each}
                   {:else}
                     <span class="text-muted">None</span>
@@ -349,7 +356,10 @@ function removeImpact(iid: string) {
         <ul class="list-group mb-3">
           {#each hazardMitigations as m}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span>{m.description}</span>
+              <div>
+                <div>{m.description}</div>
+                <div class="text-muted small">{getMitigationImplementationLabel(m.implementationClass)}</div>
+              </div>
               <div class="btn-group">
                 <button
                   class="btn btn-sm btn-outline-secondary"

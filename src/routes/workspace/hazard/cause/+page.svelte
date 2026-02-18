@@ -9,6 +9,7 @@
   import { project } from '$lib/stores/project.js';
   import { causes } from '$lib/stores/causes.js';
   import { mitigations } from '$lib/stores/mitigations.js';
+  import { getMitigationImplementationLabel } from '$lib/utils/mitigation.js';
 
   import LinkMitigationModal from '$lib/components/LinkMitigationModal.svelte';
 
@@ -138,7 +139,7 @@
   </div>
 
   <div class="mb-4">
-    <label class="form-label">Linked Mitigations</label>
+    <p class="form-label mb-1">Linked Mitigations</p>
 
     {#if linkedMitigationIds.length}
       <ul class="list-group mb-2">
@@ -146,7 +147,10 @@
           {#if $mitigations.find(m => m.id === mid)}
             {@const mit = $mitigations.find(m => m.id === mid)}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              {mit.description}
+              <div>
+                <div>{mit.description}</div>
+                <div class="text-muted small">{getMitigationImplementationLabel(mit.implementationClass)}</div>
+              </div>
               <button
                 class="btn btn-sm btn-outline-danger"
                 on:click={() => removeMitigation(mid)}

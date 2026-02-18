@@ -11,6 +11,7 @@
   import { base } from '$app/paths';
   import { HazardUtils } from '$lib/utils/hazard';
   import { assessHazardImpact } from '$lib/utils/dcbRisk';
+  import { getMitigationImplementationLabel } from '$lib/utils/mitigation.js';
 
   // ——————————————————————————————————————————
   // Reactive state
@@ -132,7 +133,10 @@
                             {#each cause.mitigationIds as mid, i}
                               {#if $mitigations.find(m => m.id === mid)}
                                 {@const mit = $mitigations.find(m => m.id === mid)}
-                                <span>{mit.description}</span
+                                <span>{mit.description}</span>
+                                <span class="text-muted small">
+                                  ({getMitigationImplementationLabel(mit.implementationClass)})
+                                </span
                                 >{i < cause.mitigationIds.length - 1 ? ', ' : ''}
                               {/if}
                             {/each}
@@ -156,13 +160,19 @@
             <div class="table-responsive mb-3">
               <table class="table table-sm table-bordered">
                 <thead>
-                  <tr><th>Mitigation</th></tr>
+                  <tr>
+                    <th>Mitigation</th>
+                    <th>Implementation Class</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {#each h.mitigationIds as mid}
                     {#if $mitigations.find(m => m.id === mid)}
                       {@const mit = $mitigations.find(m => m.id === mid)}
-                      <tr><td>{mit.description}</td></tr>
+                      <tr>
+                        <td>{mit.description}</td>
+                        <td>{getMitigationImplementationLabel(mit.implementationClass)}</td>
+                      </tr>
                     {/if}
                   {/each}
                 </tbody>

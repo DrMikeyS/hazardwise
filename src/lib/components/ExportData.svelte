@@ -7,6 +7,7 @@
   import { HazardUtils } from '$lib/utils/hazard';
   import { assessHazardImpact } from '$lib/utils/dcbRisk';
   import { downloadDocx, type DocxContentBlock, type DocxHighlight } from '$lib/utils/docxExport';
+  import { groupMitigationsByImplementationClass } from '$lib/utils/mitigation.js';
   import { base } from '$app/paths';
 
   type HazardImpact = {
@@ -31,6 +32,7 @@
   type Mitigation = {
     id: string;
     description?: string;
+    implementationClass?: string;
   };
 
   type Impact = {
@@ -166,10 +168,16 @@
 
       const relatedMitigationIds = getAllMitigationIdsForHazard(hazard, causeMap);
       if (relatedMitigationIds.length) {
+        const relatedMitigations = relatedMitigationIds
+          .map((mitigationId) => mitigationMap.get(mitigationId))
+          .filter(Boolean) as Mitigation[];
+        const groupedMitigations = groupMitigationsByImplementationClass(relatedMitigations);
+
         paragraphs.push({ text: 'Related Mitigations:', bold: true });
-        for (const mitigationId of relatedMitigationIds) {
-          const mitigation = mitigationMap.get(mitigationId);
-          if (mitigation) {
+        for (const group of groupedMitigations) {
+          if (!group.items.length) continue;
+          paragraphs.push({ text: group.label, bold: true });
+          for (const mitigation of group.items) {
             paragraphs.push({
               text: `- ${mitigation.id}: ${mitigation.description || 'No description'}`
             });
@@ -211,6 +219,7 @@
 
   function buildMitigationListParagraphs(): DocxContentBlock[] {
     const mitigationItems = get(mitigations) as Mitigation[];
+    const groupedMitigations = groupMitigationsByImplementationClass(mitigationItems);
 
     const paragraphs: DocxContentBlock[] = [
       { text: `Mitigation List - ${getProjectTitle()}`, bold: true },
@@ -223,11 +232,21 @@
       return paragraphs;
     }
 
-    for (const mitigation of mitigationItems) {
-      paragraphs.push({
-        text: `${mitigation.id}: ${mitigation.description || 'No description'}`,
-        bold: true
-      });
+    for (const group of groupedMitigations) {
+      paragraphs.push({ text: group.label, bold: true });
+      paragraphs.push({ text: group.helpText });
+
+      if (!group.items.length) {
+        paragraphs.push({ text: 'No mitigations in this class.' });
+        paragraphs.push({ text: '' });
+        continue;
+      }
+
+      for (const mitigation of group.items) {
+        paragraphs.push({
+          text: `${mitigation.id}: ${mitigation.description || 'No description'}`
+        });
+      }
       paragraphs.push({ text: '' });
     }
 
